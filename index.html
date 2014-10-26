@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<!--
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html ng-app="SoccerKeeperApp">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+        <link rel="stylesheet" type="text/css" href="css/ionic.min.css" />
+        <title>Hello World</title>
+    </head>
+    <body>
+    	<ion-nav-view animation="slide-left-right"></ion-nav-view>
+        
+    	<div class="bar bar-header bar-positive">
+			<h1 class="title">Soccer Keeper</h1>
+			<a class="button" href="#/newMatch">New</a>
+		</div>
+		<br/>
+		<br/>
+		<br/>
+		<br/>
+		<h1>Loading...</h1>
+        
+        <script id="templates/home.html" type="text/ng-template">
+			<ion-view title="home">
+				<ion-content class="padding">
+				
+			        <div class="app">
+						<div class="content has-header ionic-pseudo">
+							<div class="list">
+								<div class="item item-divider">
+								    A'kes
+								</div>
+								
+								<a class="item" href="#">
+								    Butterfinger
+								</a>
+								<div class="item item-divider">
+								    B'kes
+								</div>
+								
+								<a class="item" href="#">
+								    Butterfinger
+								</a>
+							</div>
+						</div>
+			        </div>
+
+				</ion-content>
+			</ion-view>
+		</script>
+        
+        
+        <script id="templates/newMatch.html" type="text/ng-template">
+			<ion-view title="newMatch">
+				<ion-content ng-controller="SoccerController">
+			        <div class="app">
+			        	<br/>
+			        	<br/>
+			        	<div class="list">
+			        		<label class="item item-input">
+			        			<input type="text" id="txtTeam" placeholder="Team">
+			        		</label>
+			        		<label class="item item-input">
+			        			<input type="text" id="txtOpponent" placeholder="Opponent">
+			        		</label>
+			        		<label class="item item-input">
+			        			<input type="date" id="txtDate" placeholder="Date" ng-model="today">
+			        		</label>
+			        		Home
+			        		<label class="toggle">
+								<input type="checkbox" id="chkHome">
+								<div class="track">
+									<div class="handle"></div>
+								</div>
+							</label>
+			        		<div class="row" id="period1">
+				        		<label class="item item-input">
+				        			<span class="input-label">Period 1</span>
+				        			<input type="number" id="txtPeriodLen1" placeholder="Lengte">
+				        		</label>
+			        		</div>
+			        		<div class="row" id="period2">
+				        		<label class="item item-input">
+				        			<span class="input-label">Period 2</span>
+				        			<input type="number" id="txtPeriodLen2" placeholder="Lengte">
+				        		</label>
+			        		</div>
+			        		<div id="newPeriod"/>
+			        		<button class="button button-stable" ng-click="addPeriod()">Add period</button>
+				        	<br/>
+				        	<br/>
+			        		<button class="button button-positive" ng-click="startMatch()">Start match</button>
+			        	</div>
+			        </div>
+				</ion-content>
+			</ion-view>
+		</script>
+        
+        
+        <script id="templates/startMatch.html" type="text/ng-template">
+			<ion-view title="Start Match">
+				<ion-content ng-controller="MatchController">
+			        <div class="app">
+			        	<br/>
+			        	<br/>
+			        	<div class="box">
+							<label for="qty">{{ currentMatch.team }}</label>
+							<input id="qty" value="0" ng-model="currentMatch.teamScore" />
+							<button id="down" ng-click="addToTeam(-1)">-1</button>
+							<button id="up" ng-click="addToTeam(1)">+1</button>
+			        	</div>
+			        	<div class="box">
+							<label for="qty">{{ currentMatch.opponent }}</label>
+							<input id="qty" value="0" ng-model="currentMatch.opponentScore" />
+							<button id="down" ng-click="addToOpponent(-1)">-1</button>
+							<button id="up" ng-click="addToOpponent(1)">+1</button>
+			        	</div>
+			        </div>
+				</ion-content>
+			</ion-view>
+		</script>
+		
+        <script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>	
+        <script type="text/javascript" src="js/ionic.bundle.min.js"></script>		
+        <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="js/index.js"></script>
+        <script type="text/javascript" src="js/model/matches.js"></script>
+        <script type="text/javascript" src="js/SoccerService.js"></script>
+        <script type="text/javascript" src="js/Navigation.js"></script>
+        <script type="text/javascript" src="js/SoccerController.js"></script>
+        <script type="text/javascript">
+            app.initialize();
+        </script>
+    </body>
+</html>
