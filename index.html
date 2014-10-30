@@ -27,38 +27,35 @@
     </head>
     <body>
     	<ion-nav-view animation="slide-left-right"></ion-nav-view>
+    	
         
     	<div class="bar bar-header bar-positive">
+			<a class="button" href="#/">Home</a>
 			<h1 class="title">Soccer Keeper</h1>
 			<a class="button" href="#/newMatch">New</a>
 		</div>
-		<br/>
-		<br/>
-		<br/>
-		<br/>
-		<h1>Loading...</h1>
+				<br/>
+				<br/>
+				<br/>
+				<br/>
+				<h1>Loading...</h1>
         
         <script id="templates/home.html" type="text/ng-template">
 			<ion-view title="home">
-				<ion-content class="padding">
+				<ion-content class="padding" ng-controller="HomeController">
 				
 			        <div class="app">
 						<div class="content has-header ionic-pseudo">
 							<div class="list">
-								<div class="item item-divider">
-								    A'kes
+								<div ng-repeat="team in teams">
+									<div class="item item-divider">
+									    {{ team.team }}
+									</div>
+									
+									<a class="item" href="#" ng-repeat="match in team.matches">
+									    {{ match.opponent }} | {{ match.home }} | {{ match.teamScore }} - {{ match.opponentScore }}
+									</a>
 								</div>
-								
-								<a class="item" href="#">
-								    Butterfinger
-								</a>
-								<div class="item item-divider">
-								    B'kes
-								</div>
-								
-								<a class="item" href="#">
-								    Butterfinger
-								</a>
 							</div>
 						</div>
 			        </div>
@@ -133,6 +130,18 @@
 							<button id="down" ng-click="addToOpponent(-1)">-1</button>
 							<button id="up" ng-click="addToOpponent(1)">+1</button>
 			        	</div>
+			        	<br/>
+			        	<h1>{{ periodCounter + 1 }} / {{ currentMatch.periods.length }}</h1>
+			        	<br/>
+			        	<div class="box">
+			        		<span id="divMinutes"><h1>{{ minutes }}</h1></span><h1>:</h1>
+			        		<span id="divSeconds"><h1>{{ seconds }}</h1></span>
+			        	</div>
+			        	<button class="button button-stable" ng-click="startPeriod()">Start Period</button>
+			        	<button class="button button-stable" ng-click="updateDisplay()">Update Display</button>
+			        	<br/>
+			        	<br/>
+			        	<button class="button button-stable" ng-click="saveData()">Save Data</button>
 			        </div>
 				</ion-content>
 			</ion-view>
@@ -142,10 +151,13 @@
         <script type="text/javascript" src="js/ionic.bundle.min.js"></script>		
         <script type="text/javascript" src="cordova.js"></script>
         <script type="text/javascript" src="js/index.js"></script>
+        <script type="text/javascript" src="js/model/variables.js"></script>
         <script type="text/javascript" src="js/model/matches.js"></script>
         <script type="text/javascript" src="js/SoccerService.js"></script>
         <script type="text/javascript" src="js/Navigation.js"></script>
         <script type="text/javascript" src="js/SoccerController.js"></script>
+        <script type="text/javascript" src="js/service/fileService.js"></script>
+        
         <script type="text/javascript">
             app.initialize();
         </script>
