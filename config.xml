@@ -15,7 +15,7 @@
 
     <gap:platform name="ios" />
 
-	<plugin name="File" value="CDVFile" />
-	<plugin name="FileTransfer" value="CDVFileTransfer" />
+	<gap:plugin name="File" value="CDVFile" />
+	<gap:plugin name="FileTransfer" value="CDVFileTransfer" />
 
 </widget>
