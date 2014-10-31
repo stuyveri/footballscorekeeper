@@ -17,7 +17,6 @@
 
 	<gap:plugin name="org.apache.cordova.file" version="1.3.1" />
 
-	<gap:splash src="IMG_0278.JPG" gap:platform="ios" width="640" height="1136" />
 	<icon src="logo.png" gap:platform="ios" width="60" height="60" />
 
 </widget>

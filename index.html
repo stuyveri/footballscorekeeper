@@ -101,17 +101,17 @@
 			<ion-view title="Start Match">
 				<ion-content ng-controller="MatchController">
 			        	<table cellspacing="0" cellpadding="0" border="0" class="field" width="100%" height="100%">
-			        		<tr height="150">
+			        		<tr height="75">
 			        			<td width="25%" align="center"><h1><br/>{{ currentMatch.team }}</h1></td>
 			        			<td width="50%" align="center"><h1><br/>{{ periodCounter + 1 }} / {{ currentMatch.periods.length }}</h1></td>
 			        			<td width="25%" align="center"><h1><br/>{{ currentMatch.opponent }}</h1></td>
 			        		</tr>
-			        		<tr height="300">
+			        		<tr height="150">
 			        			<td width="25%" align="center" valign="middle"><strong style="font-size: 70px;">{{ currentMatch.teamScore }}</strong></td>
 			        			<td width="50%" align="center" valign="middle"><h1>{{ minutes }}&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;{{ seconds }}</h1></td>
 			        			<td width="25%" align="center" valign="middle"><strong style="font-size: 70px;">{{ currentMatch.opponentScore }}</strong></td>
 			        		</tr>
-			        		<tr height="150">
+			        		<tr height="75">
 			        			<td width="25%" align="center">
 									<button id="down" ng-click="addToTeam(-1)">-1</button>
 									<button id="up" ng-click="addToTeam(1)">+1</button>
