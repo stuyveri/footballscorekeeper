@@ -32,10 +32,11 @@ angular.module('SoccerKeeperApp', ['ionic'])
 			if( variables.savedData == null || variables.savedData == "" ) {
 				variables.savedData = new SavedData();
 			}
-			variables.savedData.addMatch( currentMatchService.currentMatch );
+			addMatch( variables.savedData, currentMatchService.currentMatch );
 			
 			var data = angular.toJson(variables.savedData)
 			console.log("data: " + data);
+
 			FileWriter.write( data );
 			FileWriter.onwriteend = onEnd;
 		};
@@ -44,11 +45,14 @@ angular.module('SoccerKeeperApp', ['ionic'])
 
 .controller('HomeController', function($scope, currentMatchService) {
 	$scope.teams = variables.savedData.teams;
+
+	$("#barHeader").show();
 })
 
 .controller('SoccerController', function($scope, $location, currentMatchService) {
 	$scope.today = new Date();
 	$scope.periodCounter = 3;
+	$scope.isHome = true;
 	
 	$scope.addPeriod = function() { 
 		console.log("addPeriod called.");
@@ -60,7 +64,7 @@ angular.module('SoccerKeeperApp', ['ionic'])
 		console.log("startMatch called.");
 		
 		//Fill match & teams
-		currentMatchService.currentMatch = new Match( $("#txtTeam").val(), $("#txtDate").val(), $("#txtOpponent").val(),  $("#chkHome").val() );
+		currentMatchService.currentMatch = new Match( $("#txtTeam").val(), $("#txtDate").val(), $("#txtOpponent").val(),  $scope.isHome );
 		
 		$( "input[id*='txtPeriodLen']" ).each( function(index) { 
 			var period = new Period( index, $( this ).val() );
@@ -81,6 +85,9 @@ angular.module('SoccerKeeperApp', ['ionic'])
 	$scope.currentPeriod = null;
 	$scope.minutes = '00';
 	$scope.seconds = '00';
+
+	//do not display header
+	$("#barHeader").hide();
 	
 	$scope.addToTeam = function(val) { 
 		console.log("addToTeam called.");

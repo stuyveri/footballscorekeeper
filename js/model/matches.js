@@ -49,21 +49,21 @@ function SavedData() {
 	this.dataVersion= variables.dataVersion;
 	this.softwareVersion= variables.softwareVersion;
 	this.teams = []; //list of TeamItem
+}
 	
-	this.addMatch = function (match) {
-		var found = false;
-		$.each( this.teams, function( i, val ) {
-			if( this.teams[i].team == match.team ) {
-				this.teams[i].matches.push( match );
-				found = true;
-			}
-		});
-		
-		if( !found ) {
-			//create TeamItem
-			var teamItem = new TeamItem(match);
-			this.teams.push( teamItem );
+function addMatch(savedData, match) {
+	var found = false;
+	$.each( savedData.teams, function( i, val ) {
+		if( savedData.teams[i].team == match.team ) {
+			savedData.teams[i].matches.push( match );
+			found = true;
 		}
+	});
+	
+	if( !found ) {
+		//create TeamItem
+		var teamItem = new TeamItem(match);
+		savedData.teams.push( teamItem );
 	}
 }
 
