@@ -1,9 +1,11 @@
 function Match(teamIn, datePlayedIn, opponentIn, homeIn) {
+	this.id;
 	this.team = teamIn;
 	this.date = datePlayedIn;
 	this.opponent = opponentIn;
 	this.home = homeIn;
 	this.periods = [];
+	this.myTeamPlayers = [];
 	
 	this.teamScore = 0;
 	this.opponentScore = 0;
@@ -23,14 +25,15 @@ function Period(numberIn, lengthIn) {
 	}
 }
 
-function Goal(minuteIn, scoreTeamIn, scoreOppIn, isForTeamIn) {
+function Goal(minuteIn, scoreTeamIn, scoreOppIn, isForTeamIn, playerIn) {
 	//goal is always counted in the next minute as they start from 0. zero based counting
 	this.minute = minuteIn + 1;
 	//this is the score for easy use: 0 - 1
 	this.score = scoreTeamIn + ' - ' + scoreOppIn;
 	//indicator if the team you are following has scored. This is for later dev to calculate
 	this.isForMyTeam = isForTeamIn;
-	
+	//who scored the goal
+	this.player = playerIn;
 }
 
 

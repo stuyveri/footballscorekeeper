@@ -1,5 +1,7 @@
 document.addEventListener("deviceready", onDeviceReadyForFile, false);
 var FileSystem = null;
+var FileEntry = null;
+var FileEntryBackup = null;
 var FileWriter = null;
 var FileReader = null;
 
@@ -12,14 +14,22 @@ function onDeviceReadyForFile() {
 function gotFS(fileSystem) {
 	console.log("gotFS called.");
 	FileSystem = fileSystem;
-	FileSystem.root.getFile("FootballScoreKeeper", {create: true, exclusive: false}, gotFileEntry, fail);
+	FileSystem.root.getFile(variables.fileName, {create: true, exclusive: false}, gotFileEntry, fail);
+	FileSystem.root.getFile(variables.backupFileName, {create: true, exclusive: false}, gotFileEntryBackup, fail);
 }
 
 //Settings file section
-function gotFileEntry(fileEntry) {
+function gotFileEntry(entry) {
 	console.log("gotFileEntry called.");
-	fileEntry.createWriter(gotFileWriter, fail);
-	fileEntry.file(gotFile, fail);
+	FileEntry = entry;
+	FileEntry.createWriter(gotFileWriter, fail);
+	FileEntry.file(gotFile, fail);
+}
+
+//Settings file section
+function gotFileEntryBackup(entry) {
+	console.log("gotFileEntryBackup called.");
+	FileEntryBackup = entry;
 }
 
 function gotFileWriter(writer) {
@@ -63,5 +73,10 @@ function clearFile() {
 
 function fail(evt) {
 	//TODO: alert or something like that
-    console.log("error during file processing. Code: " + evt.target.error.code);
+    console.log("error during file processing. Code: " + evt.code);
+}
+
+function fileSuccess(evt) {
+	//TODO: alert or something like that
+    console.log("success during file processing. Code: " + evt.code);
 }

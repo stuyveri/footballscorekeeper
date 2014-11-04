@@ -1,5 +1,11 @@
 var variables = {
 	savedData : null,
-	dataVersion : "1.0",
-	softwareVersion : "0.1.0.0"
+	dataVersion : "1.1", 
+	//1.1: 
+	//		Id added
+	//		myTeamPlayers
+	//		goal.player
+	softwareVersion : "0.2.0.0",
+	fileName : "FootballScoreKeeper",
+	backupFileName : "FootballScoreKeeperBackup"
 }
