@@ -1,7 +1,6 @@
 document.addEventListener("deviceready", onDeviceReadyForFile, false);
 var FileSystem = null;
 var FileEntry = null;
-var FileEntryBackup = null;
 var FileWriter = null;
 var FileReader = null;
 
@@ -15,7 +14,6 @@ function gotFS(fileSystem) {
 	console.log("gotFS called.");
 	FileSystem = fileSystem;
 	FileSystem.root.getFile(variables.fileName, {create: true, exclusive: false}, gotFileEntry, fail);
-	FileSystem.root.getFile(variables.backupFileName, {create: true, exclusive: false}, gotFileEntryBackup, fail);
 }
 
 //Settings file section
@@ -24,12 +22,6 @@ function gotFileEntry(entry) {
 	FileEntry = entry;
 	FileEntry.createWriter(gotFileWriter, fail);
 	FileEntry.file(gotFile, fail);
-}
-
-//Settings file section
-function gotFileEntryBackup(entry) {
-	console.log("gotFileEntryBackup called.");
-	FileEntryBackup = entry;
 }
 
 function gotFileWriter(writer) {
@@ -48,13 +40,15 @@ function gotFile(file) {
 		console.log("data1: " + data);
 
 		if( data != "" ) {
-			var dataObj = angular.fromJson(evt.target.result);
-			//console.log("data2: " + dataObj.settings);
-			//angular.fromJson(settingsString)
+			var dataObj = evt.target.result;
 			variables.savedData = dataObj;
-		} else {
-			console.log("Init savedData var");
-			variables.savedData = new SavedData();
+			console.log("savedData: " + variables.savedData);
+
+			//TODO: Save Data
+			//Create team
+			//Add match
+			//		Undefined scoring player
+			//fix for period
 		}
 
 		//launch event

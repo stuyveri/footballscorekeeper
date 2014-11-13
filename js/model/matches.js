@@ -1,38 +1,41 @@
-function Match(teamIn, datePlayedIn, opponentIn, homeIn) {
-	this.id;
+function Match(idIn, teamIn, datePlayedIn, opponentIn, homeIn) {
+	this.id = idIn;
 	this.team = teamIn;
 	this.date = datePlayedIn;
 	this.opponent = opponentIn;
 	this.home = homeIn;
 	this.periods = [];
-	this.myTeamPlayers = [];
+	this.matchplayers = [];
 	
 	this.teamScore = 0;
 	this.opponentScore = 0;
-	
-	this.pushPeriod = function (period) {
-		this.periods.push( period );
-	}
 }
 
-function Period(numberIn, lengthIn) {
+function Period(idIn, matchIn, numberIn, lengthIn) {
+	this.id = idIn;
 	this.number = numberIn;
 	this.length = lengthIn;
+	this.match = matchIn;
 	this.goals = [];
-	
-	this.pushGoal = function (goal) {
-		this.goals.push( goal );
-	}
 }
 
-function Goal(minuteIn, scoreTeamIn, scoreOppIn, isForTeamIn, playerIn) {
+function Goal(idIn, minuteIn, scoreTeamIn, scoreOppIn, isForTeamIn, playerIn, periodIn) {
+	this.id = idIn;
 	//goal is always counted in the next minute as they start from 0. zero based counting
-	this.minute = minuteIn + 1;
+	this.minute = minuteIn;
 	//this is the score for easy use: 0 - 1
-	this.score = scoreTeamIn + ' - ' + scoreOppIn;
+	this.scoreMyTeam = scoreTeamIn;
+	this.scoreOpponent = scoreOppIn;
 	//indicator if the team you are following has scored. This is for later dev to calculate
 	this.isForMyTeam = isForTeamIn;
 	//who scored the goal
+	this.player = playerIn;
+	this.period = periodIn;
+}
+
+function MatchPlayer(idIn, matchIn, playerIn) {
+	this.id = idIn;
+	this.match = matchIn;
 	this.player = playerIn;
 }
 
@@ -70,7 +73,16 @@ function addMatch(savedData, match) {
 	}
 }
 
-function TeamItem(match) {
-	this.team = match.team;
-	this.matches = [match];
+function Team(idIn, teamName) {
+	this.id = idIn;
+	this.name = teamName;
+	this.matches = [];
+}
+
+function Player(idIn, firstnameIn, lastnameIn) {
+	this.id = idIn;
+	this.firstname = firstnameIn;
+	this.lastname = lastnameIn;
+	//this does not map on the database but is required for the checkboxes
+	this.checked;
 }

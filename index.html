@@ -16,21 +16,40 @@
     </head>
     <body>
     	<ion-nav-view animation="slide-left-right"></ion-nav-view>
-    	
-        
-    	<div class="bar bar-header bar-positive" id="barHeader">
-			<a class="button" href="#/">Home</a>
-			<h1 class="title">Score Keeper</h1>
-			<a class="button" href="#/newMatch">New</a>
+		<div class="bar bar-footer bar-balanced" id="barFooter">
+			<button class="button button-icon button-clear ion-ios7-person" onclick="window.location = '#/players'"></button>
+			<div class="title">
+			<button class="button button-icon button-clear ion-ios7-home" onclick="window.location = '#/'"></button>
+			</div>
+			<button class="button button-icon button-clear ion-ios7-people" onclick="window.location = '#/teams'"></button>
 		</div>
-				<br/>
-				<br/>
-				<br/>
-				<br/>
-				<h1>Loading...</h1>
+
+<!--
+HHHHHHHHH     HHHHHHHHH                                                             
+H:::::::H     H:::::::H                                                             
+H:::::::H     H:::::::H                                                             
+HH::::::H     H::::::HH                                                             
+  H:::::H     H:::::H     ooooooooooo      mmmmmmm    mmmmmmm       eeeeeeeeeeee    
+  H:::::H     H:::::H   oo:::::::::::oo  mm:::::::m  m:::::::mm   ee::::::::::::ee  
+  H::::::HHHHH::::::H  o:::::::::::::::om::::::::::mm::::::::::m e::::::eeeee:::::ee
+  H:::::::::::::::::H  o:::::ooooo:::::om::::::::::::::::::::::me::::::e     e:::::e
+  H:::::::::::::::::H  o::::o     o::::om:::::mmm::::::mmm:::::me:::::::eeeee::::::e
+  H::::::HHHHH::::::H  o::::o     o::::om::::m   m::::m   m::::me:::::::::::::::::e 
+  H:::::H     H:::::H  o::::o     o::::om::::m   m::::m   m::::me::::::eeeeeeeeeee  
+  H:::::H     H:::::H  o::::o     o::::om::::m   m::::m   m::::me:::::::e           
+HH::::::H     H::::::HHo:::::ooooo:::::om::::m   m::::m   m::::me::::::::e          
+H:::::::H     H:::::::Ho:::::::::::::::om::::m   m::::m   m::::m e::::::::eeeeeeee  
+H:::::::H     H:::::::H oo:::::::::::oo m::::m   m::::m   m::::m  ee:::::::::::::e  
+HHHHHHHHH     HHHHHHHHH   ooooooooooo   mmmmmm   mmmmmm   mmmmmm    eeeeeeeeeeeeee  
+-->
         
         <script id="templates/home.html" type="text/ng-template">
 			<ion-view title="home">
+		    	<div class="bar bar-header bar-balanced" id="barHeader">
+					<button class="button button-clear"></button><!-- to make sure other buttons are at the right side -->
+					<h1 class="title">Score Keeper</h1>
+					<button class="button button-icon button-clear ion-ios7-football-outline" onclick="window.location = '#/newMatch'" id="idNewMatch"></button>
+				</div>
 				<ion-content class="padding" ng-controller="HomeController">
 				
 			        <div class="app">
@@ -38,35 +57,66 @@
 							<div class="list">
 								<div ng-repeat="team in teams">
 									<div class="item item-divider">
-									    {{ team.team }}
+									    {{ team.name }}
 									</div>
 									
 									<a class="item" ng-click="clickListItem(match)" ng-repeat="match in team.matches">
-									    <span class="{{ (( match.teamScore == match.opponentScore ) ? 'energized-bg energized-border' : (( match.teamScore > match.opponentScore ) ? 'balanced-bg balanced-border' : 'assertive-bg assertive-border' ) ) }}">&nbsp;&nbsp;</span> &nbsp;&nbsp;{{ match.date }} | {{ match.opponent }} | {{ match.home }} | {{ match.teamScore }} - {{ match.opponentScore }}
+									    <table cellspacing="0" cellpadding="0" border="0" width="100%">
+									    	<tr>
+									    		<td width="50%"><h1>{{ match.opponent }}</h1></td>
+									    		<td width="50%" align="right"><h1><span class="{{ (( match.teamScore == match.opponentScore ) ? 'energized-bg energized-border' : (( match.teamScore > match.opponentScore ) ? 'balanced-bg balanced-border' : 'assertive-bg assertive-border' ) ) }}">{{ match.teamScore }} - {{ match.opponentScore }}</span></h1></td>
+									    	</tr>
+									    	<tr>
+									    		<td width="50%">{{ match.date.toLocaleDateString() }}</td>
+									    		<td width="50%" align="right">{{ match.home ? 'Home' : 'Out' }}</td>
+									    	</tr>
+									    </table>
 									</a>
 								</div>
 							</div>
 						</div>
 			        </div>
-			        <button class="button button-stable" ng-click="restoreBackup()">Restore Backup</button>
-
+			        			<input type="text" id="preffile">
 				</ion-content>
 			</ion-view>
 		</script>
-        
+
+<!--
+MMMMMMMM               MMMMMMMM                          tttt                             hhhhhhh             
+M:::::::M             M:::::::M                       ttt:::t                             h:::::h             
+M::::::::M           M::::::::M                       t:::::t                             h:::::h             
+M:::::::::M         M:::::::::M                       t:::::t                             h:::::h             
+M::::::::::M       M::::::::::M  aaaaaaaaaaaaa  ttttttt:::::ttttttt        cccccccccccccccch::::h hhhhh       
+M:::::::::::M     M:::::::::::M  a::::::::::::a t:::::::::::::::::t      cc:::::::::::::::ch::::hh:::::hhh    
+M:::::::M::::M   M::::M:::::::M  aaaaaaaaa:::::at:::::::::::::::::t     c:::::::::::::::::ch::::::::::::::hh  
+M::::::M M::::M M::::M M::::::M           a::::atttttt:::::::tttttt    c:::::::cccccc:::::ch:::::::hhh::::::h 
+M::::::M  M::::M::::M  M::::::M    aaaaaaa:::::a      t:::::t          c::::::c     ccccccch::::::h   h::::::h
+M::::::M   M:::::::M   M::::::M  aa::::::::::::a      t:::::t          c:::::c             h:::::h     h:::::h
+M::::::M    M:::::M    M::::::M a::::aaaa::::::a      t:::::t          c:::::c             h:::::h     h:::::h
+M::::::M     MMMMM     M::::::Ma::::a    a:::::a      t:::::t    ttttttc::::::c     ccccccch:::::h     h:::::h
+M::::::M               M::::::Ma::::a    a:::::a      t::::::tttt:::::tc:::::::cccccc:::::ch:::::h     h:::::h
+M::::::M               M::::::Ma:::::aaaa::::::a      tt::::::::::::::t c:::::::::::::::::ch:::::h     h:::::h
+M::::::M               M::::::M a::::::::::aa:::a       tt:::::::::::tt  cc:::::::::::::::ch:::::h     h:::::h
+MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      cccccccccccccccchhhhhhh     hhhhhhh
+-->        
         
         <script id="templates/newMatch.html" type="text/ng-template">
 			<ion-view title="newMatch">
+		    	<div class="bar bar-header bar-balanced" id="barHeader">
+					<button class="button button-clear"></button><!-- to make sure other buttons are at the right side -->
+					<h1 class="title">New Match</h1>
+				</div>
 				<ion-content ng-controller="SoccerController">
 			        <div class="app">
 			        	<br/>
 			        	<br/>
-			        	<br/>
-			        	<br/>
-			        	<div class="list">
-			        		<label class="item item-input">
-			        			<input type="text" id="txtTeam" placeholder="Team"/>
-			        		</label>
+			        	<div>
+		  					<label class="item item-input item-select">
+							    <div class="input-label">Team:</div>
+								<select ng-model="team" ng-change="teamSelected()" ng-options="team as team.name for team in teams">
+									<option value="">-- choose team --</option>
+								</select>
+					        </label>
 			        		<label class="item item-input">
 			        			<input type="text" id="txtOpponent" placeholder="Opponent"/>
 			        		</label>
@@ -90,11 +140,36 @@
 			        		<button class="button button-stable" ng-click="addPeriod()">Add period</button>
 				        	<br/>
 				        	<br/>
-			        		<button class="button button-positive" ng-click="startMatch()">Start match</button>
+							<ul class="list">
+								<li class="item item-checkbox" ng-repeat="player in playersforteam">
+									<ion-checkbox id="chkPlayer{{player.id}}" ng-model="player.checked">{{player.firstname}}&nbsp;{{player.lastname}}</ion-checkbox>
+			        			</li>
+			        		</ul>
+			        		<br/>
+			        		<br/>
+			        		<button class="button button-stable" ng-click="startMatch()">Start Match</button>
 			        	</div>
 			        </div>
 				</ion-content>
 			</ion-view>
+		</script>
+        
+        
+        <script id="modal/selectPlayer.html" type="text/ng-template">
+			<ion-modal-view>
+				<ion-header-bar>
+					<h1 class="title">Select Scoring Player</h1>
+				</ion-header-bar>
+				<ion-content>
+					<!-- 
+						- list players, onclick => player selected
+						- if wrong player => pop and redo
+					-->
+					<ion-list>
+						<ion-item ng-repeat="player in playersForTeam" ng-click="choosePlayer(player)">{{player.firstname}}&nbsp;{{player.lastname}}</ion-item>
+					</ion-list>
+				</ion-content>
+			</ion-modal-view>
 		</script>
         
         
@@ -103,7 +178,7 @@
 				<ion-content ng-controller="MatchController">
 			        	<table cellspacing="0" cellpadding="0" border="0" class="field" width="100%" height="100%">
 			        		<tr height="75">
-			        			<td width="25%" align="center"><h1><br/>{{ currentMatch.team }}</h1></td>
+			        			<td width="25%" align="center"><h1><br/>{{ currentMatch.team.name }}</h1></td>
 			        			<td width="50%" align="center"><h1>Period<br/>{{ periodCounter + 1 }} / {{ currentMatch.periods.length }}</h1></td>
 			        			<td width="25%" align="center"><h1><br/>{{ currentMatch.opponent }}</h1></td>
 			        		</tr>
@@ -114,24 +189,308 @@
 			        		</tr>
 			        		<tr height="75">
 			        			<td width="25%" align="center">
-									<button id="down" ng-click="addToTeam(-1)">-1</button>
-									<button id="up" ng-click="addToTeam(1)">+1</button>
+									<button ng-click="addToTeam(-1)" id="btnAddToTeam1" style="display:none">-1</button>
+									<button ng-click="addToTeam(1)" id="btnAddToTeam2" style="display:none">+1</button>
 								</td>
 			        			<td width="50%" align="center">
-						        	<button class="button button-stable" ng-click="startPeriod()">Start</button>
-						        	<button class="button button-stable" ng-click="updateDisplay()">Update</button>
-						        	<button class="button button-stable" ng-click="saveData()">Save</button>
+						        	<button class="button button-stable" ng-click="startPeriod()" id="btnStartPeriod">Start</button>
+						        	<button class="button button-stable" ng-click="updateDisplay()" id="btnUpdateDisplay" style="display:none">Update</button>
+						        	<button class="button button-stable" ng-click="saveData()" id="btnSaveData" style="display:none">Save</button>
 									<a class="button" href="#/">Home</a>
 			        			</td>
 			        			<td width="25%" align="center">
-									<button id="down" ng-click="addToOpponent(-1)">-1</button>
-									<button id="up" ng-click="addToOpponent(1)">+1</button>
+									<button ng-click="addToOpponent(-1)" id="btnAddToOpponent1" style="display:none">-1</button>
+									<button ng-click="addToOpponent(1)" id="btnAddToOpponent2" style="display:none">+1</button>
 								</td>
 			        		</tr>
 			        	</table>
 				</ion-content>
 			</ion-view>
 		</script>
+
+        
+        
+        <script id="templates/MatchDetails.html" type="text/ng-template">
+			<ion-view title="Match Details">
+		    	<div class="bar bar-header bar-balanced" id="barHeader">
+					<h1 class="title">Match Detail</h1>
+				</div>
+				<ion-content ng-controller="MatchDetailController">
+			        	<br/>
+			        	<br/>
+			        	<ul class="list">
+						    <li class="item">
+					        	<table cellspacing="0" cellpadding="0" border="0" width="100%" height="100%">
+					        		<tr>
+					        			<td width="49%" align="center"><h1>{{ currentMatch.home ? currentMatch.team : currentMatch.opponent }}</h1></td>
+					        			<td width="2%" align="center">&nbsp;</td>
+					        			<td width="49%" align="center"><h1>{{ currentMatch.home ? currentMatch.opponent : currentMatch.team }}</h1></td>
+					        		</tr>
+					        		<tr>
+					        			<td width="49%" align="right" valign="bottom"><font size="25" color="grey">{{ currentMatch.home ? currentMatch.teamScore : currentMatch.opponentScore }}&nbsp;</font></td>
+					        			<td width="2%" align="center"><img src="img/greybar.jpg"></td>
+					        			<td width="49%" align="left" valign="bottom"><font size="25" color="grey">&nbsp;{{ currentMatch.home ? currentMatch.opponentScore : currentMatch.teamScore }}</font></td>
+					        		</tr>
+					        	</table>
+						    </li>
+						    <li class="item" align="center">
+						    	<b>{{ currentMatch.date.toLocaleDateString() }}</b>
+						    </li>
+						    <li class="item">
+
+						    	<div class="list list-inset">
+						    		<div ng-repeat="period in currentMatch.periods">
+							    		<div class="item" ng-repeat="goal in period.goals">
+					        				<table cellspacing="0" cellpadding="0" border="0" width="100%" height="100%">
+								        		<tr>
+								        			<td width="50%" align="left">{{goal.player.firstname + " " + goal.player.lastname}}&nbsp;&nbsp;{{goal.minute}}'<!--'--></td>
+								        			<td width="50%" align="center">
+								        				<span class="{{ goal.isForMyTeam ? 'balanced-bg balanced-border' : 'assertive-bg assertive-border' }}">
+								        					{{ goal.scoreMyTeam + " - " + goal.scoreOpponent}}
+								        				</span>
+								        			</td>
+								        		</tr>
+					        				</table>
+							    		</div>
+						    		</div>
+						    	</div>
+						    </li>
+						    <li class="item">
+						    	Lineup:
+						    	<div class="list list-inset">
+						    		<div class="item" ng-repeat="matchplayer in currentMatch.matchplayers">
+						    			{{matchplayer.firstname}}&nbsp;{{matchplayer.lastname}}
+						    		</div>
+						    	</div>
+						    </li>
+						</ul>
+				</ion-content>
+			</ion-view>
+		</script>
+<!--
+TTTTTTTTTTTTTTTTTTTTTTT                                                                         
+T:::::::::::::::::::::T                                                                         
+T:::::::::::::::::::::T                                                                         
+T:::::TT:::::::TT:::::T                                                                         
+TTTTTT  T:::::T  TTTTTTeeeeeeeeeeee    aaaaaaaaaaaaa      mmmmmmm    mmmmmmm       ssssssssss   
+        T:::::T      ee::::::::::::ee  a::::::::::::a   mm:::::::m  m:::::::mm   ss::::::::::s  
+        T:::::T     e::::::eeeee:::::eeaaaaaaaaa:::::a m::::::::::mm::::::::::mss:::::::::::::s 
+        T:::::T    e::::::e     e:::::e         a::::a m::::::::::::::::::::::ms::::::ssss:::::s
+        T:::::T    e:::::::eeeee::::::e  aaaaaaa:::::a m:::::mmm::::::mmm:::::m s:::::s  ssssss 
+        T:::::T    e:::::::::::::::::e aa::::::::::::a m::::m   m::::m   m::::m   s::::::s      
+        T:::::T    e::::::eeeeeeeeeee a::::aaaa::::::a m::::m   m::::m   m::::m      s::::::s   
+        T:::::T    e:::::::e         a::::a    a:::::a m::::m   m::::m   m::::mssssss   s:::::s 
+      TT:::::::TT  e::::::::e        a::::a    a:::::a m::::m   m::::m   m::::ms:::::ssss::::::s
+      T:::::::::T   e::::::::eeeeeeeea:::::aaaa::::::a m::::m   m::::m   m::::ms::::::::::::::s 
+      T:::::::::T    ee:::::::::::::e a::::::::::aa:::am::::m   m::::m   m::::m s:::::::::::ss  
+      TTTTTTTTTTT      eeeeeeeeeeeeee  aaaaaaaaaa  aaaammmmmm   mmmmmm   mmmmmm  sssssssssss    
+-->        
+        
+        <script id="templates/Teams.html" type="text/ng-template">
+			<ion-view title="Teams">
+		    	<div class="bar bar-header bar-balanced" id="barHeader">
+					<button class="button button-clear"></button><!-- to make sure other buttons are at the right side -->
+					<h1 class="title">Teams</h1>
+					<button class="button button-icon button-clear ion-plus" onclick="window.location = '#/manageteam'" id="idNewTeam"></button>
+				</div>
+				<ion-content ng-controller="TeamsController">
+		        	<br/>
+		        	<br/>
+		        	<!--
+					//Show list
+					//	Teams
+					//	show '+' button that goes to add Team
+					//  Delete, Edit => swipe
+		        	-->
+					<ion-list can-swipe="true">
+						<ion-item ng-repeat="team in teams" ng-click="details(team)">{{team.name}}
+							<ion-option-button class="button-assertive" ng-click="delete(team)">Del</ion-option-button>
+							<ion-option-button class="button-positive" ng-click="edit(team)">Edit</ion-option-button>
+						</ion-item>
+					</ion-list>
+				</ion-content>
+			</ion-view>
+		</script>
+        
+        <script id="templates/ManageTeam.html" type="text/ng-template">
+			<ion-view title="Manage Team">
+		    	<div class="bar bar-header bar-balanced" id="barHeader">
+					<button class="button button-clear"></button><!-- to make sure other buttons are at the right side -->
+					<h1 class="title">Manage Team</h1>
+				</div>
+				<ion-content ng-controller="TeamController">
+		        	<br/>
+		        	<br/>
+	        		<label class="item item-input">
+	        			<input type="text" id="txtNewTeam" placeholder="Team Name" ng-model="teamName"/>
+	        		</label>
+			        <button class="button button-stable" ng-click="addTeam()" id="btnAddTeam">Add Team</button>
+			        <button class="button button-stable" ng-click="updateTeam()" id="btnUpdateTeam" style="display:none">Update Team</button>
+				</ion-content>
+			</ion-view>
+		</script>
+        
+        <script id="templates/Team.html" type="text/ng-template">
+			<ion-view title="Team">
+		    	<div class="bar bar-header bar-balanced" id="barHeader">
+					<button class="button button-clear"></button><!-- to make sure other buttons are at the right side -->
+					<h1 class="title">Team</h1>
+				</div>
+				<ion-content ng-controller="TeamController">
+		        	<br/>
+		        	<br/>
+		        	<h1>{{team.name}}</h1>
+		        	<!--
+		        		TODO:
+		        			- nr of matches
+		        			- won matches
+		        			- lost matches
+		        			- goals made vs goals against
+		        	-->
+		        	<br/>
+  					<label class="item item-input item-select">
+					    <div class="input-label">Players:</div>
+						<select ng-model="playerToAdd">
+							<option value="">-- choose player --</option>
+							<option ng-repeat="player in players" value="{{player.id}}">{{player.firstname}}&nbsp;{{player.lastname}}</option>
+						</select>
+			        </label>
+		        	<br/>
+				    <button class="button button-stable" ng-click="addPlayer()">Add Player</button>
+		        	<br/>
+		        	<h2>Players:</h2>
+					<ion-list can-swipe="true">
+						<ion-item ng-repeat="player in teamplayers">{{player.firstname}}&nbsp;{{player.lastname}}
+							<ion-option-button class="button-assertive" ng-click="deletePlayer(player)">Del</ion-option-button>
+						</ion-item>
+					</ion-list>
+				</ion-content>
+			</ion-view>
+		</script>
+
+<!--
+PPPPPPPPPPPPPPPPP   lllllll                                                                                               
+P::::::::::::::::P  l:::::l                                                                                               
+P::::::PPPPPP:::::P l:::::l                                                                                               
+PP:::::P     P:::::Pl:::::l                                                                                               
+  P::::P     P:::::P l::::l   aaaaaaaaaaaaayyyyyyy           yyyyyyy eeeeeeeeeeee    rrrrr   rrrrrrrrr       ssssssssss   
+  P::::P     P:::::P l::::l   a::::::::::::ay:::::y         y:::::yee::::::::::::ee  r::::rrr:::::::::r    ss::::::::::s  
+  P::::PPPPPP:::::P  l::::l   aaaaaaaaa:::::ay:::::y       y:::::ye::::::eeeee:::::eer:::::::::::::::::r ss:::::::::::::s 
+  P:::::::::::::PP   l::::l            a::::a y:::::y     y:::::ye::::::e     e:::::err::::::rrrrr::::::rs::::::ssss:::::s
+  P::::PPPPPPPPP     l::::l     aaaaaaa:::::a  y:::::y   y:::::y e:::::::eeeee::::::e r:::::r     r:::::r s:::::s  ssssss 
+  P::::P             l::::l   aa::::::::::::a   y:::::y y:::::y  e:::::::::::::::::e  r:::::r     rrrrrrr   s::::::s      
+  P::::P             l::::l  a::::aaaa::::::a    y:::::y:::::y   e::::::eeeeeeeeeee   r:::::r                  s::::::s   
+  P::::P             l::::l a::::a    a:::::a     y:::::::::y    e:::::::e            r:::::r            ssssss   s:::::s 
+PP::::::PP          l::::::la::::a    a:::::a      y:::::::y     e::::::::e           r:::::r            s:::::ssss::::::s
+P::::::::P          l::::::la:::::aaaa::::::a       y:::::y       e::::::::eeeeeeee   r:::::r            s::::::::::::::s 
+P::::::::P          l::::::l a::::::::::aa:::a     y:::::y         ee:::::::::::::e   r:::::r             s:::::::::::ss  
+PPPPPPPPPP          llllllll  aaaaaaaaaa  aaaa    y:::::y            eeeeeeeeeeeeee   rrrrrrr              sssssssssss    
+                                                 y:::::y                                                                  
+                                                y:::::y                                                                   
+                                               y:::::y                                                                    
+                                              y:::::y                                                                     
+                                             yyyyyyy                                                                      
+-->        
+        
+        <script id="templates/Players.html" type="text/ng-template">
+			<ion-view title="Players">
+		    	<div class="bar bar-header bar-balanced" id="barHeader">
+					<button class="button button-clear"></button><!-- to make sure other buttons are at the right side -->
+					<h1 class="title">Players</h1>
+					<button class="button button-icon button-clear ion-plus" onclick="window.location = '#/manageplayer'" id="idNewPlayer"></button>
+				</div>
+				<ion-content ng-controller="PlayersController">
+					<!--
+					//Show list
+					//	Teams
+					//	show '+' button that goes to add Team
+					//  Delete, Edit => swipe
+					-->
+		        	<br/>
+		        	<br/>
+					<ion-list can-swipe="true">
+						<ion-item ng-repeat="player in players" ng-click="details(player)">{{player.firstname}}&nbsp;{{player.lastname}}
+							<ion-option-button class="button-assertive" ng-click="delete(player)">Del</ion-option-button>
+							<ion-option-button class="button-positive" ng-click="edit(player)">Edit</ion-option-button>
+						</ion-item>
+					</ion-list>
+				</ion-content>
+			</ion-view>
+		</script>
+        
+        <script id="templates/ManagePlayer.html" type="text/ng-template">
+			<ion-view title="Manage Player">
+		    	<div class="bar bar-header bar-balanced" id="barHeader">
+					<button class="button button-clear"></button><!-- to make sure other buttons are at the right side -->
+					<h1 class="title">Manage Player</h1>
+				</div>
+				<ion-content ng-controller="PlayerController">
+		        	<br/>
+		        	<br/>
+		        	<br/>
+		        	<br/>
+	        		<label class="item item-input">
+	        			<input type="text" placeholder="Player Firstname" ng-model="firstName"/>
+	        		</label>
+	        		<label class="item item-input">
+	        			<input type="text" placeholder="Player lastname" ng-model="lastName"/>
+	        		</label>
+			        <button class="button button-stable" ng-click="addPlayer()" id="btnAddPlayer" >Add Player</button>
+			        <button class="button button-stable" ng-click="updatePlayer()" id="btnUpdatePlayer" style="display:none">Update Player</button>
+				</ion-content>
+			</ion-view>
+		</script>
+        
+        <script id="templates/Player.html" type="text/ng-template">
+			<ion-view title="Player">
+		    	<div class="bar bar-header bar-balanced" id="barHeader">
+					<button class="button button-clear"></button><!-- to make sure other buttons are at the right side -->
+					<h1 class="title">Player</h1>
+				</div>
+				<ion-content ng-controller="PlayerController">
+		        	<br/>
+		        	<br/>
+		        	<br/>
+		        	<br/>
+	        		<h1>{{player.firstname}}&nbsp;{{player.lastname}}</h1>
+	        		<!--
+	        			todo: 
+	        				- add teams
+	        				- add goals
+	        				- add # of matches 
+	        		-->
+		        	<h2>Teams:</h2>
+					<ion-list>
+						<ion-item ng-repeat="team in teams" ng-click="goToTeam(team)">{{team.name}}</ion-item>
+					</ion-list>
+				</ion-content>
+			</ion-view>
+		</script>
+
+<!--
+   SSSSSSSSSSSSSSS                                          iiii                              tttt                           
+ SS:::::::::::::::S                                        i::::i                          ttt:::t                           
+S:::::SSSSSS::::::S                                         iiii                           t:::::t                           
+S:::::S     SSSSSSS                                                                        t:::::t                           
+S:::::S                ccccccccccccccccrrrrr   rrrrrrrrr  iiiiiiippppp   ppppppppp   ttttttt:::::ttttttt        ssssssssss   
+S:::::S              cc:::::::::::::::cr::::rrr:::::::::r i:::::ip::::ppp:::::::::p  t:::::::::::::::::t      ss::::::::::s  
+ S::::SSSS          c:::::::::::::::::cr:::::::::::::::::r i::::ip:::::::::::::::::p t:::::::::::::::::t    ss:::::::::::::s 
+  SS::::::SSSSS    c:::::::cccccc:::::crr::::::rrrrr::::::ri::::ipp::::::ppppp::::::ptttttt:::::::tttttt    s::::::ssss:::::s
+    SSS::::::::SS  c::::::c     ccccccc r:::::r     r:::::ri::::i p:::::p     p:::::p      t:::::t           s:::::s  ssssss 
+       SSSSSS::::S c:::::c              r:::::r     rrrrrrri::::i p:::::p     p:::::p      t:::::t             s::::::s      
+            S:::::Sc:::::c              r:::::r            i::::i p:::::p     p:::::p      t:::::t                s::::::s   
+            S:::::Sc::::::c     ccccccc r:::::r            i::::i p:::::p    p::::::p      t:::::t    ttttttssssss   s:::::s 
+SSSSSSS     S:::::Sc:::::::cccccc:::::c r:::::r           i::::::ip:::::ppppp:::::::p      t::::::tttt:::::ts:::::ssss::::::s
+S::::::SSSSSS:::::S c:::::::::::::::::c r:::::r           i::::::ip::::::::::::::::p       tt::::::::::::::ts::::::::::::::s 
+S:::::::::::::::SS   cc:::::::::::::::c r:::::r           i::::::ip::::::::::::::pp          tt:::::::::::tt s:::::::::::ss  
+ SSSSSSSSSSSSSSS       cccccccccccccccc rrrrrrr           iiiiiiiip::::::pppppppp              ttttttttttt    sssssssssss    
+                                                                  p:::::p                                                    
+                                                                  p:::::p                                                    
+                                                                 p:::::::p                                                   
+                                                                 p:::::::p                                                   
+                                                                 p:::::::p                                                   
+                                                                 ppppppppp                                                   
+-->
 		
         <script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>	
         <script type="text/javascript" src="js/ionic.bundle.min.js"></script>		
@@ -141,9 +500,10 @@
         <script type="text/javascript" src="js/model/matches.js"></script>
         <script type="text/javascript" src="js/SoccerService.js"></script>
         <script type="text/javascript" src="js/Navigation.js"></script>
-        <script type="text/javascript" src="js/SoccerController.js"></script>
+        <script type="text/javascript" src="js/controller/playerController.js"></script>
         <script type="text/javascript" src="js/service/fileService.js"></script>
         <script type="text/javascript" src="js/service/databaseService.js"></script>
+        <script type="text/javascript" src="js/service/services.js"></script>
         
         <script type="text/javascript">
             app.initialize();

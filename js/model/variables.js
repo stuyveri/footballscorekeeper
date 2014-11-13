@@ -7,5 +7,8 @@ var variables = {
 	//		goal.player
 	softwareVersion : "0.2.0.0",
 	fileName : "FootballScoreKeeper",
-	backupFileName : "FootballScoreKeeperBackup"
+	maxMatchId : 0,
+	maxPeriodId : 0,
+	maxGoalId : 0,
+	maxMatchPlayerId : 0
 }
