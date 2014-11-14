@@ -281,6 +281,93 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 				fnSuccess
 			);
 	    },
+	    geUndefinedPlayer: function(fnSuccess, fnError) {
+
+			variables.db.transaction(function(tx) {
+
+					tx.executeSql('SELECT Id, FirstName, LastName FROM Player WHERE Type = 2 ORDER BY LastName asc', [], 
+									function(tx, results) {
+										currentMatchService.undefinedPlayer = new Player(results.rows.item(0).Id, results.rows.item(0).FirstName, results.rows.item(0).LastName);
+										console.log("undefinedPlayer: " + angular.toJson(currentMatchService.undefinedPlayer));
+									}, 
+									fnError
+								); 
+				}, 
+				fnError, 
+				fnSuccess
+			);
+	    },
+	    addMatches: function(fnSuccess, fnError) {
+
+			variables.db.transaction(function(tx) {
+
+					tx.executeSql('INSERT INTO Match(Id, Opponent, MatchDate, IsHomeMatch, TeamScore, OpponentScore, Team) VALUES (1, "Wildert", ' + (new Date(14, 11, 1, 0, 0, 0)).getTime() + ', 0, 10, 5, 1)'); 
+					tx.executeSql('INSERT INTO Match(Id, Opponent, MatchDate, IsHomeMatch, TeamScore, OpponentScore, Team) VALUES (2, "Kalmthout", ' + (new Date(14, 11, 8, 0, 0, 0)).getTime() + ', 0, 5, 16, 1)'); 
+
+					tx.executeSql('INSERT INTO MatchPlayer(Id, Match, Player) VALUES (1, 1, ' + currentMatchService.undefinedPlayer.id + ')'); 
+					tx.executeSql('INSERT INTO MatchPlayer(Id, Match, Player) VALUES (2, 2, ' + currentMatchService.undefinedPlayer.id + ')'); 
+
+					tx.executeSql('INSERT INTO Period(Id, Number, Length, Match) VALUES (1, 0, 15, 1)');
+					tx.executeSql('INSERT INTO Period(Id, Number, Length, Match) VALUES (2, 1, 15, 1)');
+					tx.executeSql('INSERT INTO Period(Id, Number, Length, Match) VALUES (3, 2, 15, 1)');
+					tx.executeSql('INSERT INTO Period(Id, Number, Length, Match) VALUES (4, 3, 15, 1)');
+
+					tx.executeSql('INSERT INTO Period(Id, Number, Length, Match) VALUES (5, 0, 15, 2)');
+					tx.executeSql('INSERT INTO Period(Id, Number, Length, Match) VALUES (6, 1, 15, 2)');
+					tx.executeSql('INSERT INTO Period(Id, Number, Length, Match) VALUES (7, 2, 15, 2)');
+					tx.executeSql('INSERT INTO Period(Id, Number, Length, Match) VALUES (8, 3, 15, 2)');
+					
+					//match1, period1
+					tx.executeSql('INSERT INTO Goal(Id, Minute, ScoreMyTeam, ScoreOpponent, IsForMyTeam, Period, Player) VALUES (1, 1, 1, 0, 1, 1, ' + currentMatchService.undefinedPlayer.id + ')'); 
+					tx.executeSql('INSERT INTO Goal(Id, Minute, ScoreMyTeam, ScoreOpponent, IsForMyTeam, Period, Player) VALUES (2, 1, 2, 0, 1, 1, ' + currentMatchService.undefinedPlayer.id + ')'); 
+					tx.executeSql('INSERT INTO Goal(Id, Minute, ScoreMyTeam, ScoreOpponent, IsForMyTeam, Period, Player) VALUES (3, 1, 2, 1, 0, 1, ' + currentMatchService.opponentPlayer.id + ')'); 
+					tx.executeSql('INSERT INTO Goal(Id, Minute, ScoreMyTeam, ScoreOpponent, IsForMyTeam, Period, Player) VALUES (4, 1, 2, 2, 0, 1, ' + currentMatchService.opponentPlayer.id + ')');
+					//match1, period2
+					tx.executeSql('INSERT INTO Goal(Id, Minute, ScoreMyTeam, ScoreOpponent, IsForMyTeam, Period, Player) VALUES (5, 20, 2, 3, 0, 2, ' + currentMatchService.opponentPlayer.id + ')');
+					tx.executeSql('INSERT INTO Goal(Id, Minute, ScoreMyTeam, ScoreOpponent, IsForMyTeam, Period, Player) VALUES (6, 23, 2, 4, 0, 2, ' + currentMatchService.opponentPlayer.id + ')');
+					tx.executeSql('INSERT INTO Goal(Id, Minute, ScoreMyTeam, ScoreOpponent, IsForMyTeam, Period, Player) VALUES (7, 24, 3, 4, 1, 2, ' + currentMatchService.undefinedPlayer.id + ')');
+					tx.executeSql('INSERT INTO Goal(Id, Minute, ScoreMyTeam, ScoreOpponent, IsForMyTeam, Period, Player) VALUES (8, 29, 4, 4, 1, 2, ' + currentMatchService.undefinedPlayer.id + ')');
+					tx.executeSql('INSERT INTO Goal(Id, Minute, ScoreMyTeam, ScoreOpponent, IsForMyTeam, Period, Player) VALUES (9, 30, 5, 4, 1, 2, ' + currentMatchService.undefinedPlayer.id + ')');
+					//match1, period3
+					tx.executeSql('INSERT INTO Goal(Id, Minute, ScoreMyTeam, ScoreOpponent, IsForMyTeam, Period, Player) VALUES (10, 31, 6, 4, 1, 3, ' + currentMatchService.undefinedPlayer.id + ')');
+					tx.executeSql('INSERT INTO Goal(Id, Minute, ScoreMyTeam, ScoreOpponent, IsForMyTeam, Period, Player) VALUES (11, 33, 7, 4, 1, 3, ' + currentMatchService.undefinedPlayer.id + ')');
+					tx.executeSql('INSERT INTO Goal(Id, Minute, ScoreMyTeam, ScoreOpponent, IsForMyTeam, Period, Player) VALUES (12, 43, 8, 4, 1, 3, ' + currentMatchService.undefinedPlayer.id + ')');
+					//match1, period4
+					tx.executeSql('INSERT INTO Goal(Id, Minute, ScoreMyTeam, ScoreOpponent, IsForMyTeam, Period, Player) VALUES (13, 46, 9, 4, 1, 4, ' + currentMatchService.undefinedPlayer.id + ')');
+					tx.executeSql('INSERT INTO Goal(Id, Minute, ScoreMyTeam, ScoreOpponent, IsForMyTeam, Period, Player) VALUES (14, 50, 10, 4, 1, 4, ' + currentMatchService.undefinedPlayer.id + ')');
+					tx.executeSql('INSERT INTO Goal(Id, Minute, ScoreMyTeam, ScoreOpponent, IsForMyTeam, Period, Player) VALUES (15, 54, 10, 5, 0, 4, ' + currentMatchService.opponentPlayer.id + ')');
+
+					
+					//match2, period1
+					tx.executeSql('INSERT INTO Goal(Id, Minute, ScoreMyTeam, ScoreOpponent, IsForMyTeam, Period, Player) VALUES (16, 1, 1, 0, 1, 5, ' + currentMatchService.undefinedPlayer.id + ')');
+					tx.executeSql('INSERT INTO Goal(Id, Minute, ScoreMyTeam, ScoreOpponent, IsForMyTeam, Period, Player) VALUES (17, 4, 1, 1, 0, 5, ' + currentMatchService.opponentPlayer.id + ')');
+					tx.executeSql('INSERT INTO Goal(Id, Minute, ScoreMyTeam, ScoreOpponent, IsForMyTeam, Period, Player) VALUES (18, 4, 1, 2, 0, 5, ' + currentMatchService.opponentPlayer.id + ')');
+					tx.executeSql('INSERT INTO Goal(Id, Minute, ScoreMyTeam, ScoreOpponent, IsForMyTeam, Period, Player) VALUES (19, 11, 1, 3, 0, 5, ' + currentMatchService.opponentPlayer.id + ')');
+					tx.executeSql('INSERT INTO Goal(Id, Minute, ScoreMyTeam, ScoreOpponent, IsForMyTeam, Period, Player) VALUES (20, 11, 1, 4, 0, 5, ' + currentMatchService.opponentPlayer.id + ')');
+					tx.executeSql('INSERT INTO Goal(Id, Minute, ScoreMyTeam, ScoreOpponent, IsForMyTeam, Period, Player) VALUES (21, 11, 1, 5, 0, 5, ' + currentMatchService.opponentPlayer.id + ')');
+					tx.executeSql('INSERT INTO Goal(Id, Minute, ScoreMyTeam, ScoreOpponent, IsForMyTeam, Period, Player) VALUES (22, 15, 2, 5, 1, 5, ' + currentMatchService.undefinedPlayer.id + ')');
+					tx.executeSql('INSERT INTO Goal(Id, Minute, ScoreMyTeam, ScoreOpponent, IsForMyTeam, Period, Player) VALUES (23, 15, 2, 6, 0, 5, ' + currentMatchService.opponentPlayer.id + ')');
+					//match2, period2
+					tx.executeSql('INSERT INTO Goal(Id, Minute, ScoreMyTeam, ScoreOpponent, IsForMyTeam, Period, Player) VALUES (24, 17, 3, 6, 1, 6, ' + currentMatchService.undefinedPlayer.id + ')');
+					tx.executeSql('INSERT INTO Goal(Id, Minute, ScoreMyTeam, ScoreOpponent, IsForMyTeam, Period, Player) VALUES (25, 21, 4, 6, 1, 6, ' + currentMatchService.undefinedPlayer.id + ')');
+					tx.executeSql('INSERT INTO Goal(Id, Minute, ScoreMyTeam, ScoreOpponent, IsForMyTeam, Period, Player) VALUES (26, 30, 4, 7, 0, 6, ' + currentMatchService.opponentPlayer.id + ')');
+					//match2, period3
+					tx.executeSql('INSERT INTO Goal(Id, Minute, ScoreMyTeam, ScoreOpponent, IsForMyTeam, Period, Player) VALUES (27, 34, 4, 8, 0, 7, ' + currentMatchService.opponentPlayer.id + ')');
+					tx.executeSql('INSERT INTO Goal(Id, Minute, ScoreMyTeam, ScoreOpponent, IsForMyTeam, Period, Player) VALUES (28, 41, 5, 8, 1, 7, ' + currentMatchService.undefinedPlayer.id + ')');
+					//match2, period4
+					tx.executeSql('INSERT INTO Goal(Id, Minute, ScoreMyTeam, ScoreOpponent, IsForMyTeam, Period, Player) VALUES (29, 46, 5, 9, 0, 8, ' + currentMatchService.opponentPlayer.id + ')');
+					tx.executeSql('INSERT INTO Goal(Id, Minute, ScoreMyTeam, ScoreOpponent, IsForMyTeam, Period, Player) VALUES (30, 48, 5, 10, 0, 8, ' + currentMatchService.opponentPlayer.id + ')');
+					tx.executeSql('INSERT INTO Goal(Id, Minute, ScoreMyTeam, ScoreOpponent, IsForMyTeam, Period, Player) VALUES (31, 48, 5, 11, 0, 8, ' + currentMatchService.opponentPlayer.id + ')');
+					tx.executeSql('INSERT INTO Goal(Id, Minute, ScoreMyTeam, ScoreOpponent, IsForMyTeam, Period, Player) VALUES (32, 51, 5, 12, 0, 8, ' + currentMatchService.opponentPlayer.id + ')');
+					tx.executeSql('INSERT INTO Goal(Id, Minute, ScoreMyTeam, ScoreOpponent, IsForMyTeam, Period, Player) VALUES (33, 53, 5, 13, 0, 8, ' + currentMatchService.opponentPlayer.id + ')');
+					tx.executeSql('INSERT INTO Goal(Id, Minute, ScoreMyTeam, ScoreOpponent, IsForMyTeam, Period, Player) VALUES (34, 57, 5, 14, 0, 8, ' + currentMatchService.opponentPlayer.id + ')');
+					tx.executeSql('INSERT INTO Goal(Id, Minute, ScoreMyTeam, ScoreOpponent, IsForMyTeam, Period, Player) VALUES (35, 58, 5, 15, 0, 8, ' + currentMatchService.opponentPlayer.id + ')');
+					tx.executeSql('INSERT INTO Goal(Id, Minute, ScoreMyTeam, ScoreOpponent, IsForMyTeam, Period, Player) VALUES (36, 59, 5, 16, 0, 8, ' + currentMatchService.opponentPlayer.id + ')');
+				}, 
+				fnError, 
+				fnSuccess
+			);
+	    },
 /*
 	    getUndefinedPlayer: function(fnSuccess, fnError) {
 

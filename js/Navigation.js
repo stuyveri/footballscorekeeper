@@ -68,6 +68,7 @@ c:::::::cccccc:::::cu:::::::::::::::uur:::::r             r:::::r            e::
 	this.interval = null;
 	this.playersForTeam = [];
 	this.opponentPlayer;
+	this.undefinedPlayer;
 	//Id for SQL insert
   	this.matchId;
   	this.periodId;
@@ -140,6 +141,7 @@ HHHHHHHHH     HHHHHHHHH   ooooooooooo   mmmmmm   mmmmmm   mmmmmm    eeeeeeeeeeee
 		//retrieve all matches
 		MatchService.getAllMatches(success, error);
 		MatchService.getOpponentPlayer(successOpponent, error);
+		MatchService.geUndefinedPlayer(successOpponent, error);
 		MatchService.getMaxIds(successGetIds, error);
 		currentMatchService.initDone = true;
 
@@ -178,6 +180,11 @@ HHHHHHHHH     HHHHHHHHH   ooooooooooo   mmmmmm   mmmmmm   mmmmmm    eeeeeeeeeeee
 			},
 		});
 	};
+
+	$scope.insertMatches = function(match) {
+					MatchService.addMatches(successForward, error);
+	};
+
 
 	function success()  {
 		$scope.$apply(
