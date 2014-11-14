@@ -134,6 +134,7 @@ HHHHHHHHH     HHHHHHHHH   ooooooooooo   mmmmmm   mmmmmm   mmmmmm    eeeeeeeeeeee
 
 .controller('HomeController', function($scope, $ionicActionSheet, $location, $ionicPlatform, $ionicPopup, currentMatchService, MatchService) {
 	$scope.teams;
+	$scope.fileData;
 
 	$ionicPlatform.ready(function () {
 		//retrieve all matches
@@ -143,7 +144,7 @@ HHHHHHHHH     HHHHHHHHH   ooooooooooo   mmmmmm   mmmmmm   mmmmmm    eeeeeeeeeeee
 		currentMatchService.initDone = true;
 
 
-		$("#preffile").val(variables.savedData);
+		$scope.fileData = variables.savedData;
 	});
 
 	$("#barFooter").show();
@@ -625,11 +626,11 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 		//	add period lengths from previous periods
 		var minute = diffTime.getMinutes() + 1;
         if( $scope.currentPeriod.length < diffTime.getMinutes() ) {
-			minute = $scope.currentPeriod.length;
+			minute = parseInt($scope.currentPeriod.length);
         }
         if( $scope.currentPeriod.number != 0 ) {
 			for(var i=0; i<$scope.currentPeriod.number; i++) {
-				minute = minute + $scope.currentMatch.periods[i].length;
+				minute = parseInt(minute) + parseInt($scope.currentMatch.periods[i].length);
 			}
         }
 
