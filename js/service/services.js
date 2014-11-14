@@ -168,7 +168,7 @@ PPPPPPPPPP          llllllll  aaaaaaaaaa  aaaa    y:::::y            eeeeeeeeeee
 
 			variables.db.transaction(function(tx) {
 
-					tx.executeSql('UPDATE Player SET FirstName = "' + player.firstname + '", LastName = "' + player.lastname + '"WHERE Id = "' + team.id + '"'); 
+					tx.executeSql('UPDATE Player SET FirstName = "' + player.firstname + '", LastName = "' + player.lastname + '"WHERE Id = "' + player.id + '"'); 
 				}, 
 				fnError, 
 				fnSuccess
@@ -301,8 +301,8 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 
 			variables.db.transaction(function(tx) {
 
-					tx.executeSql('INSERT INTO Match(Id, Opponent, MatchDate, IsHomeMatch, TeamScore, OpponentScore, Team) VALUES (1, "Wildert", ' + (new Date(14, 11, 1, 0, 0, 0)).getTime() + ', 0, 10, 5, 1)'); 
-					tx.executeSql('INSERT INTO Match(Id, Opponent, MatchDate, IsHomeMatch, TeamScore, OpponentScore, Team) VALUES (2, "Kalmthout", ' + (new Date(14, 11, 8, 0, 0, 0)).getTime() + ', 0, 5, 16, 1)'); 
+					tx.executeSql('INSERT INTO Match(Id, Opponent, MatchDate, IsHomeMatch, TeamScore, OpponentScore, Team) VALUES (1, "Wildert", ' + (new Date(2014, 11, 1, 0, 0, 0)).getTime() + ', 0, 10, 5, 1)'); 
+					tx.executeSql('INSERT INTO Match(Id, Opponent, MatchDate, IsHomeMatch, TeamScore, OpponentScore, Team) VALUES (2, "Kalmthout", ' + (new Date(2014, 11, 8, 0, 0, 0)).getTime() + ', 0, 5, 16, 1)'); 
 
 					tx.executeSql('INSERT INTO MatchPlayer(Id, Match, Player) VALUES (1, 1, ' + currentMatchService.undefinedPlayer.id + ')'); 
 					tx.executeSql('INSERT INTO MatchPlayer(Id, Match, Player) VALUES (2, 2, ' + currentMatchService.undefinedPlayer.id + ')'); 

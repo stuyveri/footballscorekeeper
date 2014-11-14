@@ -135,7 +135,9 @@ PPPPPPPPPP          llllllll  aaaaaaaaaa  aaaa    y:::::y            eeeeeeeeeee
 	};
 	
 	$scope.updatePlayer = function(player) {
-		PlayerService.updatePlayer(player, success, error);
+		$scope.player.firstname = $scope.firstName;
+		$scope.player.lastname = $scope.lastName;
+		PlayerService.updatePlayer($scope.player, success, error);
 	};
 	
 	$scope.goToTeam = function(team) {
