@@ -150,6 +150,7 @@ HHHHHHHHH     HHHHHHHHH   ooooooooooo   mmmmmm   mmmmmm   mmmmmm    eeeeeeeeeeee
 	});
 
 	$("#barFooter").show();
+	screen.unlockOrientation();
 
 	$scope.clickListItem = function(match) {
 		currentMatchService.currentMatch = match;
@@ -580,6 +581,8 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 	$("#barHeader").hide();
 	$("#barFooter").hide();
 
+	screen.lockOrientation('landscape');
+
 	//When the app comes back from background => update screen
 	$scope.$on('resumecalled', function(event, args) {
 		console.log("resumecalled called");
@@ -650,9 +653,60 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 			$scope.modal.show();
 		} else {
 			$scope.lastGoal.player = currentMatchService.opponentPlayer;
+			//do twitter as the player is known
+			$scope.doTwitterGoal();
 			console.log("addGoal/opponentPlayer: " + angular.toJson($scope.lastGoal.player));
 		}
+
 		console.log("addGoal end: " + goal);
+	};
+
+	$scope.doTwitterGoal = function() {
+		//eg #teamname Firstname lastname 12' / 1 - 0
+		//	! thuismatch of niet
+		var msg = '#' + currentMatchService.currentMatch.team.name.replace(' ', '_') + ' ' + $scope.lastGoal.player.firstname + ' ' + $scope.lastGoal.player.lastname + ' ' + $scope.lastGoal.minute + "' / ";
+		if( currentMatchService.currentMatch.home ) {
+			msg = msg + $scope.lastGoal.scoreMyTeam + ' - ' + $scope.lastGoal.scoreOpponent;
+		} else {			
+			msg = msg + $scope.lastGoal.scoreOpponent + ' - ' + $scope.lastGoal.scoreMyTeam;
+		}
+		console.log('twitter msg: ' + msg);
+		window.plugins.socialsharing.shareViaTwitter(msg, 
+			null, //subject
+			null, //file
+			null, //link 
+			function(){console.log('share ok')}, 
+			function(msg) {
+				$ionicPopup.alert({
+					title: 'Twitter goal',
+					template: 'error: ' + msg
+				});
+			}
+		);
+	};
+
+	$scope.doTwitterStartMatch = function() {
+		//eg #teamname Firstname lastname 12' / 1 - 0
+		//	! thuismatch of niet
+		var msg = '#' + currentMatchService.currentMatch.team.name.replace(' ', '_') + ' ';
+		if( currentMatchService.currentMatch.home ) {
+			msg = msg + currentMatchService.currentMatch.team.name + ' - ' + currentMatchService.currentMatch.opponent;
+		} else {			
+			msg = msg + currentMatchService.currentMatch.opponent + ' - ' + currentMatchService.currentMatch.team.name;
+		}
+		console.log('twitter msg: ' + msg);
+		window.plugins.socialsharing.shareViaTwitter(msg, 
+			null, //subject
+			null, //file
+			null, //link 
+			function(){console.log('share ok')}, 
+			function(msg) {
+				$ionicPopup.alert({
+					title: 'Twitter start match',
+					template: 'error: ' + msg
+				});
+			}
+		);
 	};
 	
 	$scope.startPeriod = function() { 
@@ -668,6 +722,13 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 		$("#btnAddToTeam2").show();
 		$("#btnAddToOpponent1").show();
 		$("#btnAddToOpponent2").show();
+
+		if( $scope.periodCounter == -1 ) {
+			//doTwitterStartMatch
+			//	only on first period start!
+			console.log("Calling doTwitterStartMatch");
+			$scope.doTwitterStartMatch();
+		}
 		
 		if( ($scope.periodCounter + 1) < $scope.currentMatch.periods.length ) {
 			$scope.periodCounter++;
@@ -727,6 +788,9 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 		console.log("MatchController.choosePlayer lastGoal: " + $scope.lastGoal.minute + " / score: " + $scope.lastGoal.scoreMyTeam + "/" + $scope.lastGoal.scoreOpponent);
 		$scope.lastGoal.player = player;
 		$scope.modal.hide();
+
+		//do twitter as the player is known
+		$scope.doTwitterGoal();
 	};
 	
 	$scope.saveData = function() {

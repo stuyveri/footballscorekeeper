@@ -41,6 +41,8 @@ function onDeviceReadyForDatabase() {
 		
 		//TODO: move data from file to database
 	}
+
+	window.location = "#/";
 }
 
 function errorCB(err) {
