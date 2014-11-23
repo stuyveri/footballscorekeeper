@@ -85,4 +85,12 @@ function Player(idIn, firstnameIn, lastnameIn) {
 	this.lastname = lastnameIn;
 	//this does not map on the database but is required for the checkboxes
 	this.checked;
+	this.nrOfMatches;
+	this.nrOfGoals;
+}
+
+function Setting(idIn, nameIn, valueIn) {
+	this.id = idIn;
+	this.name = nameIn;
+	this.value = valueIn;
 }

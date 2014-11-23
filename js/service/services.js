@@ -95,6 +95,76 @@ TTTTTT  T:::::T  TTTTTTeeeeeeeeeeee    aaaaaaaaaaaaa      mmmmmmm    mmmmmmm   S
 				fnError, 
 				fnSuccess
 			);
+	    },
+	    getNrOfMatches: function(team, fnSuccess, fnError) {
+
+			variables.db.transaction(function(tx) {
+
+					tx.executeSql('SELECT count(*) as Cnt FROM Match WHERE Team  = ' + team.id, [], doCountMatches, fnError); 
+				}, 
+				fnError, 
+				fnSuccess
+			);
+	    },
+	    getNrOfGoals: function(team, fnSuccess, fnError) {
+
+			variables.db.transaction(function(tx) {
+
+					tx.executeSql(
+								" SELECT" +
+								"	Count(Goal.Id) AS Cnt" +
+								"	, Goal.IsForMyTeam" +
+								" FROM Match" +
+								"	INNER JOIN Team ON Team.Id = Match.Team" +
+								"	LEFT OUTER JOIN Period ON Match.Id = Period.Match" +
+								"	LEFT OUTER JOIN Goal ON Period.Id = Goal.Period" +
+								" WHERE" +
+								"	Team.Id = " + team.id +
+								"	AND Goal.IsForMyTeam IS NOT NULL" +
+								" GROUP BY" +
+								"	Goal.IsForMyTeam", 
+							[], 
+							doCountGoals, 
+							fnError); 
+				}, 
+				fnError, 
+				fnSuccess
+			);
+	    },
+	    getTeamTopScorer: function(team, fnSuccess, fnError) {
+
+			variables.db.transaction(function(tx) {
+
+					tx.executeSql(
+							" SELECT" + 
+							"	MAX(Cnt) AS CNT" +
+							"	, GoalScorerPlayerId" +
+							"	, GoalScorerFirstName" +
+							"	, GoalScorerLastName" +
+							" FROM (" +
+							"	SELECT" +
+							"		Count(GoalScorer.Id) AS Cnt" +
+							"		, GoalScorer.Id AS GoalScorerPlayerId" +
+							"		, GoalScorer.FirstName AS GoalScorerFirstName" +
+							"		, GoalScorer.LastName AS GoalScorerLastName" +
+							"	 FROM Match" +
+							"		INNER JOIN Team ON Team.Id = Match.Team" +
+							"		LEFT OUTER JOIN Period ON Match.Id = Period.Match" +
+							"		LEFT OUTER JOIN Goal ON Period.Id = Goal.Period" +
+							"		LEFT OUTER JOIN Player AS GoalScorer ON GoalScorer.Id = Goal.Player" +
+							"	 WHERE" +
+							"		Team.Id = " + team.id +
+							"		AND Goal.IsForMyTeam = 1" +
+							"	 GROUP BY" +
+							"		GoalScorer.Id" +
+							")", 
+					[], 
+					doCountTopScorer, 
+					fnError); 
+				}, 
+				fnError, 
+				fnSuccess
+			);
 	    }
 	}
 
@@ -106,6 +176,46 @@ TTTTTT  T:::::T  TTTTTTeeeeeeeeeeee    aaaaaaaaaaaaa      mmmmmmm    mmmmmmm   S
 		}
 
 		console.log("doTeams: " + angular.toJson(_teams) );
+	}
+
+	function doCountMatches(tx, results) {
+		if( results.rows.length == 1 ) {
+			variables.teamNrOfMatches = results.rows.item(0).Cnt;
+		} else {
+			variables.teamNrOfMatches = 0;
+		}
+	}
+
+	function doCountGoals(tx, results) {
+		if( results.rows.length == 1 ) {
+			if( SqlToBoolean(results.rows.item(0).IsForMyTeam) ) {
+				variables.teamNrOfGoalsScored = results.rows.item(0).Cnt;
+			} else {
+				variables.teamNrOfGoalsAgainst = results.rows.item(0).Cnt;
+			}
+		} else if( results.rows.length == 2 ) {
+			if( SqlToBoolean(results.rows.item(0).IsForMyTeam) ) {
+				variables.teamNrOfGoalsScored = results.rows.item(0).Cnt;
+			} else {
+				variables.teamNrOfGoalsAgainst = results.rows.item(0).Cnt;
+			}
+			if( SqlToBoolean(results.rows.item(1).IsForMyTeam) ) {
+				variables.teamNrOfGoalsScored = results.rows.item(1).Cnt;
+			} else {
+				variables.teamNrOfGoalsAgainst = results.rows.item(1).Cnt;
+			}
+		} else {
+			variables.teamNrOfGoalsScored = 0;
+			variables.teamNrOfGoalsAgainst = 0;
+		}
+	}
+
+	function doCountTopScorer(tx, results) {
+		if( results.rows.length == 1 ) {
+			variables.teamTopScorer = new Player(results.rows.item(0).GoalScorerPlayerId, results.rows.item(0).GoalScorerFirstName, results.rows.item(0).GoalScorerLastName);
+		} else {
+			variables.teamTopScorer = null;
+		}
 	}
 })
 
@@ -203,6 +313,26 @@ PPPPPPPPPP          llllllll  aaaaaaaaaa  aaaa    y:::::y            eeeeeeeeeee
 				fnError, 
 				fnSuccess
 			);
+	    },
+	    getNrOfMatches: function(player, fnSuccess, fnError) {
+
+			variables.db.transaction(function(tx) {
+
+					tx.executeSql('SELECT count(*) as cnt FROM MatchPlayer WHERE Player  = ' + player.id, [], doCountMatches, fnError); 
+				}, 
+				fnError, 
+				fnSuccess
+			);
+	    },
+	    getNrOfGoals: function(player, fnSuccess, fnError) {
+
+			variables.db.transaction(function(tx) {
+
+					tx.executeSql('SELECT count(*) as cnt FROM Goal WHERE Player  = ' + player.id, [], doCountGoals, fnError); 
+				}, 
+				fnError, 
+				fnSuccess
+			);
 	    }
 	}
 
@@ -225,11 +355,27 @@ PPPPPPPPPP          llllllll  aaaaaaaaaa  aaaa    y:::::y            eeeeeeeeeee
 
 		console.log("doTeamPlayers: " + angular.toJson(_teamPlayers) );
 	}
+
+	function doCountMatches(tx, results) {
+
+		if( results.rows.length == 1 ) {
+			variables.playerNrOfMatches = results.rows.item(0).cnt;
+		} else {
+			variables.playerNrOfMatches = 0;
+		}
+	}
+
+	function doCountGoals(tx, results) {
+
+		if( results.rows.length == 1 ) {
+			variables.playerNrOfGoals = results.rows.item(0).cnt;
+		} else {
+			variables.playerNrOfGoals = 0;
+		}
+	}
 })
 
-/*
-                                                                                                                                                                                                                                               
-                                                                                                                                                                                                                                               
+/*                                                                                                                                                                                                                                         
 MMMMMMMM               MMMMMMMM                          tttt                             hhhhhhh                SSSSSSSSSSSSSSS                                                                 iiii                                          
 M:::::::M             M:::::::M                       ttt:::t                             h:::::h              SS:::::::::::::::S                                                               i::::i                                         
 M::::::::M           M::::::::M                       t:::::t                             h:::::h             S:::::SSSSSS::::::S                                                                iiii                                          
@@ -607,4 +753,77 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 		currentMatchService.currentMatch = tempMatch;
 	}
 
+})
+
+/* 
+   SSSSSSSSSSSSSSS                              tttt               tttt            iiii                                                           SSSSSSSSSSSSSSS                                                                 iiii                                          
+ SS:::::::::::::::S                          ttt:::t            ttt:::t           i::::i                                                        SS:::::::::::::::S                                                               i::::i                                         
+S:::::SSSSSS::::::S                          t:::::t            t:::::t            iiii                                                        S:::::SSSSSS::::::S                                                                iiii                                          
+S:::::S     SSSSSSS                          t:::::t            t:::::t                                                                        S:::::S     SSSSSSS                                                                                                              
+S:::::S                eeeeeeeeeeee    ttttttt:::::tttttttttttttt:::::ttttttt    iiiiiiinnnn  nnnnnnnn       ggggggggg   ggggg    ssssssssss   S:::::S                eeeeeeeeeeee    rrrrr   rrrrrrrrrvvvvvvv           vvvvvvviiiiiii     cccccccccccccccc    eeeeeeeeeeee    
+S:::::S              ee::::::::::::ee  t:::::::::::::::::tt:::::::::::::::::t    i:::::in:::nn::::::::nn    g:::::::::ggg::::g  ss::::::::::s  S:::::S              ee::::::::::::ee  r::::rrr:::::::::rv:::::v         v:::::v i:::::i   cc:::::::::::::::c  ee::::::::::::ee  
+ S::::SSSS          e::::::eeeee:::::eet:::::::::::::::::tt:::::::::::::::::t     i::::in::::::::::::::nn  g:::::::::::::::::gss:::::::::::::s  S::::SSSS          e::::::eeeee:::::eer:::::::::::::::::rv:::::v       v:::::v   i::::i  c:::::::::::::::::c e::::::eeeee:::::ee
+  SS::::::SSSSS    e::::::e     e:::::etttttt:::::::tttttttttttt:::::::tttttt     i::::inn:::::::::::::::ng::::::ggggg::::::ggs::::::ssss:::::s  SS::::::SSSSS    e::::::e     e:::::err::::::rrrrr::::::rv:::::v     v:::::v    i::::i c:::::::cccccc:::::ce::::::e     e:::::e
+    SSS::::::::SS  e:::::::eeeee::::::e      t:::::t            t:::::t           i::::i  n:::::nnnn:::::ng:::::g     g:::::g  s:::::s  ssssss     SSS::::::::SS  e:::::::eeeee::::::e r:::::r     r:::::r v:::::v   v:::::v     i::::i c::::::c     ccccccce:::::::eeeee::::::e
+       SSSSSS::::S e:::::::::::::::::e       t:::::t            t:::::t           i::::i  n::::n    n::::ng:::::g     g:::::g    s::::::s             SSSSSS::::S e:::::::::::::::::e  r:::::r     rrrrrrr  v:::::v v:::::v      i::::i c:::::c             e:::::::::::::::::e 
+            S:::::Se::::::eeeeeeeeeee        t:::::t            t:::::t           i::::i  n::::n    n::::ng:::::g     g:::::g       s::::::s               S:::::Se::::::eeeeeeeeeee   r:::::r               v:::::v:::::v       i::::i c:::::c             e::::::eeeeeeeeeee  
+            S:::::Se:::::::e                 t:::::t    tttttt  t:::::t    tttttt i::::i  n::::n    n::::ng::::::g    g:::::g ssssss   s:::::s             S:::::Se:::::::e            r:::::r                v:::::::::v        i::::i c::::::c     ccccccce:::::::e           
+SSSSSSS     S:::::Se::::::::e                t::::::tttt:::::t  t::::::tttt:::::ti::::::i n::::n    n::::ng:::::::ggggg:::::g s:::::ssss::::::sSSSSSSS     S:::::Se::::::::e           r:::::r                 v:::::::v        i::::::ic:::::::cccccc:::::ce::::::::e          
+S::::::SSSSSS:::::S e::::::::eeeeeeee        tt::::::::::::::t  tt::::::::::::::ti::::::i n::::n    n::::n g::::::::::::::::g s::::::::::::::s S::::::SSSSSS:::::S e::::::::eeeeeeee   r:::::r                  v:::::v         i::::::i c:::::::::::::::::c e::::::::eeeeeeee  
+S:::::::::::::::SS   ee:::::::::::::e          tt:::::::::::tt    tt:::::::::::tti::::::i n::::n    n::::n  gg::::::::::::::g  s:::::::::::ss  S:::::::::::::::SS   ee:::::::::::::e   r:::::r                   v:::v          i::::::i  cc:::::::::::::::c  ee:::::::::::::e  
+ SSSSSSSSSSSSSSS       eeeeeeeeeeeeee            ttttttttttt        ttttttttttt  iiiiiiii nnnnnn    nnnnnn    gggggggg::::::g   sssssssssss     SSSSSSSSSSSSSSS       eeeeeeeeeeeeee   rrrrrrr                    vvv           iiiiiiii    cccccccccccccccc    eeeeeeeeeeeeee  
+                                                                                                                      g:::::g                                                                                                                                                   
+                                                                                                          gggggg      g:::::g                                                                                                                                                   
+                                                                                                          g:::::gg   gg:::::g                                                                                                                                                   
+                                                                                                           g::::::ggg:::::::g                                                                                                                                                   
+                                                                                                            gg:::::::::::::g                                                                                                                                                    
+                                                                                                              ggg::::::ggg                                                                                                                                                      
+                                                                                                                 gggggg                                                    
+*/
+.factory('SettingsService', function() {
+  	var _settings = [];
+
+	return {
+		settings : _settings,
+	    getAllSettings: function(fnSuccess, fnError) {
+
+			variables.db.transaction(function(tx) {
+
+					tx.executeSql('SELECT Id, Name, Value FROM Setting', [], doSettings, fnError); 
+				}, 
+				fnError, 
+				fnSuccess
+			);
+	    },
+	    insertSetting: function(setting, fnSuccess, fnError) {
+
+			variables.db.transaction(function(tx) {
+
+					tx.executeSql('INSERT INTO Setting(Name, Value) VALUES ("' + setting.name + '", "' + booleanToSql(setting.value) + '")'); 
+				}, 
+				fnError, 
+				fnSuccess
+			);
+	    },
+	    updateSetting: function(setting, fnSuccess, fnError) {
+
+			variables.db.transaction(function(tx) {
+
+					tx.executeSql('UPDATE Setting SET Name = "' + setting.name + '", Value = "' + booleanToSql(setting.value) + '" WHERE Id = ' + setting.id); 
+				}, 
+				fnError, 
+				fnSuccess
+			);
+	    }
+	}
+
+	function doSettings(tx, results) {
+		//Empty array but not re-init it!! otherwise it does not work
+	    _settings.length = 0;
+		for (var i=0; i<results.rows.length; i++){
+			_settings.push( new Setting(results.rows.item(i).Id, results.rows.item(i).Name, SqlToBoolean(results.rows.item(i).Value)) );
+		}
+
+		console.log("doSettings: " + angular.toJson(_settings) );
+	}
 });

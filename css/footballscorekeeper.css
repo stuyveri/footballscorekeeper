@@ -1,0 +1,13 @@
+.field {
+    background: url(../img/footballfield2.jpg);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+
+.has-error {
+  border-right: 5px solid #cc2511; 
+}
+
+.is-required {
+  border-left: 5px solid #cc2511; 
+}

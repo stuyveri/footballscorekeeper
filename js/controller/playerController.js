@@ -117,6 +117,9 @@ PPPPPPPPPP          llllllll  aaaaaaaaaa  aaaa    y:::::y            eeeeeeeeeee
 	$scope.player = $location.search();
 	$scope.teams;
 
+	PlayerService.getNrOfMatches($scope.player, successNrOfMatches, error);
+	PlayerService.getNrOfGoals($scope.player, successNrOfGoals, error);
+
 	if( $scope.player != null && $scope.player.firstname != null ) {
 		$scope.firstName = $scope.player.firstname;
 		$scope.lastName = $scope.player.lastname;
@@ -150,6 +153,24 @@ PPPPPPPPPP          llllllll  aaaaaaaaaa  aaaa    y:::::y            eeeeeeeeeee
 		    	console.log("PlayerController.success called");
 				
 				$location.path('/players');
+			}
+		);
+	};
+
+	function successNrOfMatches()  {
+		$scope.$apply(
+			function() {
+		    	console.log("PlayerController.successNrOfMatches called");				
+				$scope.player.nrOfMatches = variables.playerNrOfMatches;
+			}
+		);
+	};
+
+	function successNrOfGoals()  {
+		$scope.$apply(
+			function() {
+		    	console.log("PlayerController.successNrOfGoals called: " + variables.playerNrOfGoals);				
+				$scope.player.nrOfGoals = variables.playerNrOfGoals;
 			}
 		);
 	};

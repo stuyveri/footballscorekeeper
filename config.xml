@@ -14,6 +14,7 @@
     </author>
 
     <gap:platform name="ios" />
+    <gap:platform name="android" />
 
 	<gap:splash src="splash.png" gap:platform="ios"/>
 	<icon src="logo.png" gap:platform="ios" width="60" height="60" />

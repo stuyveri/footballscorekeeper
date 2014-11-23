@@ -7,7 +7,7 @@ function onDeviceReadyForDatabase() {
 	variables.db = window.openDatabase("FootballScoreKeeper", "", "Football Score Keeper", 200000);
 	console.log("current db version: " + variables.db.version);
 
-	if( variables.db.version != 1.0 ) {
+	if( variables.db.version == "" ) {
 		console.log("updating database from/to: " + variables.db.version + "/1.0");
 		variables.db.changeVersion(variables.db.version, "1.0");
 		//If any other changes are required or update to the structure, do them here after the DB version check
@@ -37,9 +37,19 @@ function onDeviceReadyForDatabase() {
 			errorCB, 
 			successCB
 		);
+	}
+	//Check if on latest version
+	if( variables.db.version != variables.databaseVersion ) {
+		console.log("updating database from/to: " + variables.db.version + "/1.2");
+		variables.db.changeVersion(variables.db.version, "1.2");
 
-		
-		//TODO: move data from file to database
+		variables.db.transaction(function(tx) {
+				tx.executeSql('CREATE TABLE IF NOT EXISTS Setting (Id INTEGER PRIMARY KEY ASC, Name TEXT UNIQUE, Value TEXT)');
+				console.log("Settings done.");
+			}, 
+			errorCB, 
+			successCB
+		);
 	}
 
 	window.location = "#/";

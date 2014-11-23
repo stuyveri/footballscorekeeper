@@ -40,6 +40,10 @@ angular.module('SoccerKeeperApp', ['ionic', 'SoccerKeeperApp.services', 'SoccerK
   .state('player', {
     url: '/player',
     templateUrl: "templates/Player.html"
+  })
+  .state('settings', {
+    url: '/settings',
+    templateUrl: "templates/Settings.html"
   });
 })
 
@@ -133,9 +137,11 @@ H:::::::H     H:::::::H oo:::::::::::oo m::::m   m::::m   m::::m  ee::::::::::::
 HHHHHHHHH     HHHHHHHHH   ooooooooooo   mmmmmm   mmmmmm   mmmmmm    eeeeeeeeeeeeee          CCCCCCCCCCCCC   ooooooooooo     nnnnnn    nnnnnn          ttttttttttt  rrrrrrr               ooooooooooo   llllllllllllllll    eeeeeeeeeeeeee   rrrrrrr            
 */
 
-.controller('HomeController', function($scope, $ionicActionSheet, $location, $ionicPlatform, $ionicPopup, currentMatchService, MatchService) {
+.controller('HomeController', function($scope, $ionicActionSheet, $location, $ionicPlatform, $ionicPopup, currentMatchService, MatchService, SettingsService) {
 	$scope.teams;
 	$scope.fileData;
+
+		    	console.log("HomeController.init called");
 
 	$ionicPlatform.ready(function () {
 		//retrieve all matches
@@ -143,12 +149,18 @@ HHHHHHHHH     HHHHHHHHH   ooooooooooo   mmmmmm   mmmmmm   mmmmmm    eeeeeeeeeeee
 		MatchService.getOpponentPlayer(successOpponent, error);
 		MatchService.geUndefinedPlayer(successOpponent, error);
 		MatchService.getMaxIds(successGetIds, error);
+
+		if( variables.twitterSetting.id == null ) {
+			SettingsService.getAllSettings(successAllSettings, error);
+		}
+
 		currentMatchService.initDone = true;
 
 
 		$scope.fileData = variables.savedData;
 	});
 
+		    	console.log("HomeController.barFooter called");
 	$("#barFooter").show();
 	screen.unlockOrientation();
 
@@ -223,6 +235,18 @@ HHHHHHHHH     HHHHHHHHH   ooooooooooo   mmmmmm   mmmmmm   mmmmmm    eeeeeeeeeeee
 
 		    	console.log("HomeController.successGetIds end: match: " + currentMatchService.matchId + '/period: ' + currentMatchService.periodId + '/goal: ' + currentMatchService.goalId + '/matchplayer: ' + currentMatchService.matchPlayerId);
 			}
+		);
+	};
+
+	function successAllSettings()  {
+		console.log("HomeController.successAllSettings called");
+		$scope.$apply(
+			$.each(SettingsService.settings, function(index, setting) {
+				if( setting.name == variables.TWITTER ) {
+					console.log("HomeController.successAllSettings TWITTER found");
+					variables.twitterSetting = setting;
+				}
+			})
 		);
 	};
 
@@ -340,6 +364,10 @@ TTTTTT  T:::::T  TTTTTTeeeeeeeeeeee    aaaaaaaaaaaaa      mmmmmmm    mmmmmmm    
 	$scope.players;
 	$scope.teamplayers;
 	$scope.playerToAdd;
+	$scope.teamNrOfGoalsScored = 0;
+	$scope.teamNrOfGoalsAgainst = 0;
+	$scope.topscorer = null;
+	$scope.teamNrOfMatches = 0;
 
 	console.log( "got team:" + angular.toJson($scope.team) );
 
@@ -352,6 +380,10 @@ TTTTTT  T:::::T  TTTTTTeeeeeeeeeeee    aaaaaaaaaaaaa      mmmmmmm    mmmmmmm    
 
 		PlayerService.getPlayersForTeam($scope.team, successRefreshTeamPlayers, error);
 		PlayerService.getAllPlayersNotInTeam($scope.team, successRefreshPlayers, error);
+
+		TeamService.getNrOfMatches($scope.team, successNrOfMatches, error);
+		TeamService.getNrOfGoals($scope.team, successNrOfGoals, error);
+		TeamService.getTeamTopScorer($scope.team, successTopScorer, error);
 	} else {
 		$("#btnAddTeam").show();
 		$("#btnUpdateTeam").hide();
@@ -439,6 +471,34 @@ TTTTTT  T:::::T  TTTTTTeeeeeeeeeeee    aaaaaaaaaaaaa      mmmmmmm    mmmmmmm    
 		);
 	};
 
+	function successNrOfMatches()  {
+		$scope.$apply(
+			function() {
+    			console.log("TeamController.successNrOfMatches called");
+				$scope.teamNrOfMatches = variables.teamNrOfMatches;
+			}
+		);
+	};
+
+	function successNrOfGoals()  {
+		$scope.$apply(
+			function() {
+    			console.log("TeamController.successNrOfGoals called");
+				$scope.teamNrOfGoalsScored = variables.teamNrOfGoalsScored;
+				$scope.teamNrOfGoalsAgainst = variables.teamNrOfGoalsAgainst;
+			}
+		);
+	};
+
+	function successTopScorer()  {
+		$scope.$apply(
+			function() {
+    			console.log("TeamController.successTopScorer called");
+				$scope.topscorer = variables.teamTopScorer;
+			}
+		);
+	};
+
 	function error(err) {
     	console.log("Error processing SQL: " + angular.toJson(err));
 		$ionicPopup.alert({
@@ -467,24 +527,73 @@ S:::::::::::::::SS  oo:::::::::::oo   cc:::::::::::::::c  cc:::::::::::::::c  ee
  SSSSSSSSSSSSSSS      ooooooooooo       cccccccccccccccc    cccccccccccccccc    eeeeeeeeeeeeee   rrrrrrr                    CCCCCCCCCCCCC   ooooooooooo     nnnnnn    nnnnnn          ttttttttttt  rrrrrrr               ooooooooooo   llllllllllllllll    eeeeeeeeeeeeee   rrrrrrr            
 */
 
-.controller('SoccerController', function($scope, $ionicPopup, $location, currentMatchService, TeamService, PlayerService) {
+.controller('SoccerController', function($scope, $ionicPopup, $location, $compile, currentMatchService, TeamService, PlayerService) {
 	$scope.today = new Date();
-	$scope.periodCounter = 3;
+	$scope.periodCounter = 3; //Start at 3 as the first 2 are already in the page
 	$scope.isHome = true;
 	$scope.team;
 	$scope.teams;
 	$scope.playersforteam;
+	$scope.html;
 
 	TeamService.getAllTeams(success, error);
 	
 	$scope.addPeriod = function() { 
 		console.log("addPeriod called.");
-		$("#newPeriod").before( "<div class='row' id='period" + $scope.periodCounter + "'><label class='item item-input'><span class='input-label'>Period " + $scope.periodCounter + "</span><input type='number' id='txtPeriodLen" + $scope.periodCounter + "' placeholder='Lengte'/></label></div>" );
+		//TODO: $compile
+		//$("#newPeriod").before( "<div class='row' id='period" + $scope.periodCounter + "'><label class='item item-input is-required{{ frmNewMatch.txtPeriodLen" + $scope.periodCounter + ".$error.required ? ' has-error' : '' }}'><span class='input-label'>Period " + $scope.periodCounter + "</span><input type='number' ng-model='txtPeriodLen" + $scope.periodCounter + "' id='txtPeriodLen" + $scope.periodCounter + "' name='txtPeriodLen" + $scope.periodCounter + "' placeholder='Length' ng-required='true'/></label></div>" );
+		$scope.html = "<div class='row' id='period" + $scope.periodCounter + "'><label class='item item-input is-required{{ frmNewMatch.txtPeriodLen" + $scope.periodCounter + ".$error.required ? ' has-error' : '' }}'><span class='input-label'>Period " + $scope.periodCounter + "</span><input type='number' ng-model='txtPeriodLen" + $scope.periodCounter + "' id='txtPeriodLen" + $scope.periodCounter + "' name='txtPeriodLen" + $scope.periodCounter + "' placeholder='Length' ng-required='true'/></label></div>";
+		
+        var el = angular.element($scope.html);
+        var compiled = $compile(el);
+		$("#newPeriod").before(el);
+        compiled($scope);
+
 		$scope.periodCounter++;
 	};
 	
 	$scope.startMatch = function() { 
 		console.log("startMatch called.");
+		var valid = false;
+
+/*
+		//Validation
+		if( $scope.team == "" || $scope.team == null ) {
+			console.log("validation issue.");
+			$("#lblTeam").addClass("has-error");
+			valid = false;
+		}
+		var opponent = $("#txtOpponent");
+		alert(angular.element("#txtOpponent").$error.required);
+		if( opponent.val() == "" || opponent.val() == null ) {;
+			$("#lblOpponent").addClass("has-error");
+			valid = false;
+		}
+		var date = $("#txtDate");
+		if( date.val() == "" || date.val() == null ) {
+			$("#lblDate").addClass("has-error");
+			valid = false;
+		}
+		$( "input[id*='txtPeriodLen']" ).each( function(index) { 
+			if( isInt( $( this ).val() ) ) {
+				$( this ).addClass("has-error");
+				valid = false;
+			}
+		});
+		//make sure at least 1 player is selected
+		var cnt = 0;
+		$.each($scope.playersforteam, function(index, player) {
+			//check if checkbox is selected
+			if( player.checked ) {
+				cnt++;
+			}
+		});
+		if( cnt == 0 ) {
+			valid = false;
+			$("#lstPlayers").addClass("has-error");
+		}
+*/
+
 		
 		//Fill match & teams
 		currentMatchService.matchId = currentMatchService.matchId + 1;
@@ -492,15 +601,20 @@ S:::::::::::::::SS  oo:::::::::::oo   cc:::::::::::::::c  cc:::::::::::::::c  ee
 		currentMatchService.currentMatch = new Match( currentMatchService.matchId, $scope.team, new Date($("#txtDate").val()), $("#txtOpponent").val(),  $scope.isHome );
 		
 		$( "input[id*='txtPeriodLen']" ).each( function(index) { 
-			currentMatchService.periodId = currentMatchService.periodId + 1;
-			console.log("startMatch, periodId: " + currentMatchService.periodId);
-			var period = new Period( currentMatchService.periodId, currentMatchService.currentMatch, index, $( this ).val() );
-			currentMatchService.currentMatch.periods.push( period );
+			if( isInt( $( this ).val() ) ) {
+				currentMatchService.periodId = currentMatchService.periodId + 1;
+				console.log("startMatch, periodId: " + currentMatchService.periodId);
+				var period = new Period( currentMatchService.periodId, currentMatchService.currentMatch, index, $( this ).val() );
+				currentMatchService.currentMatch.periods.push( period );
+			} else {
+				console.log("period skipped!")
+			}
 		});
 		
 		$.each($scope.playersforteam, function(index, player) {
 			//check if checkbox is selected
 			if( player.checked ) {
+				valid = true;
 				currentMatchService.matchPlayerId = currentMatchService.matchPlayerId + 1;
 				console.log("startMatch, adding matchplayer:" + player.lastname + ' & Id: ' + currentMatchService.matchPlayerId);
 				var matchplayer = new MatchPlayer( currentMatchService.matchPlayerId, currentMatchService.currentMatch, player );
@@ -510,8 +624,15 @@ S:::::::::::::::SS  oo:::::::::::oo   cc:::::::::::::::c  cc:::::::::::::::c  ee
 		});
 		
 		//console.log("currentMatchService.playersForTeam:" + angular.toJson(currentMatchService.playersForTeam));
-		
-		$location.path('/startMatch');
+			
+		if( valid ) {
+			$location.path('/startMatch');
+		} else {
+			$ionicPopup.alert({
+				title: 'Players',
+				template: 'No players selected!'
+			});
+		}
 	};
 
 	$scope.teamSelected = function() {
@@ -576,6 +697,7 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 	$scope.seconds = '00';
 	$scope.playersForTeam = currentMatchService.playersForTeam;
 	$scope.lastGoal;
+	$scope.isSaved = false;
 
 	//do not display header
 	$("#barHeader").hide();
@@ -662,51 +784,87 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 	};
 
 	$scope.doTwitterGoal = function() {
-		//eg #teamname Firstname lastname 12' / 1 - 0
-		//	! thuismatch of niet
-		var msg = '#' + currentMatchService.currentMatch.team.name.replace(' ', '_') + ' ' + $scope.lastGoal.player.firstname + ' ' + $scope.lastGoal.player.lastname + ' ' + $scope.lastGoal.minute + "' / ";
-		if( currentMatchService.currentMatch.home ) {
-			msg = msg + $scope.lastGoal.scoreMyTeam + ' - ' + $scope.lastGoal.scoreOpponent;
-		} else {			
-			msg = msg + $scope.lastGoal.scoreOpponent + ' - ' + $scope.lastGoal.scoreMyTeam;
-		}
-		console.log('twitter msg: ' + msg);
-		window.plugins.socialsharing.shareViaTwitter(msg, 
-			null, //subject
-			null, //file
-			null, //link 
-			function(){console.log('share ok')}, 
-			function(msg) {
-				$ionicPopup.alert({
-					title: 'Twitter goal',
-					template: 'error: ' + msg
-				});
+		if( variables.twitterSetting.value ) {
+			//eg #teamname Firstname lastname 12' / 1 - 0
+			//	! thuismatch of niet
+			var msg = '#' + currentMatchService.currentMatch.team.name.split(' ').join('_') + ' ' + $scope.lastGoal.player.firstname + ' ' + $scope.lastGoal.player.lastname + ' ' + $scope.lastGoal.minute + "' / ";
+			if( currentMatchService.currentMatch.home ) {
+				msg = msg + $scope.lastGoal.scoreMyTeam + ' - ' + $scope.lastGoal.scoreOpponent;
+			} else {			
+				msg = msg + $scope.lastGoal.scoreOpponent + ' - ' + $scope.lastGoal.scoreMyTeam;
 			}
-		);
+			console.log('twitter msg: ' + msg);
+			window.plugins.socialsharing.shareViaTwitter(msg, 
+				null, //subject
+				null, //file
+				null, //link 
+				function(){console.log('share ok')}, 
+				function(msg) {
+					$ionicPopup.alert({
+						title: 'Twitter goal',
+						template: 'error: ' + msg
+					});
+				}
+			);
+		}
 	};
 
 	$scope.doTwitterStartMatch = function() {
-		//eg #teamname Firstname lastname 12' / 1 - 0
-		//	! thuismatch of niet
-		var msg = '#' + currentMatchService.currentMatch.team.name.replace(' ', '_') + ' ';
-		if( currentMatchService.currentMatch.home ) {
-			msg = msg + currentMatchService.currentMatch.team.name + ' - ' + currentMatchService.currentMatch.opponent;
-		} else {			
-			msg = msg + currentMatchService.currentMatch.opponent + ' - ' + currentMatchService.currentMatch.team.name;
-		}
-		console.log('twitter msg: ' + msg);
-		window.plugins.socialsharing.shareViaTwitter(msg, 
-			null, //subject
-			null, //file
-			null, //link 
-			function(){console.log('share ok')}, 
-			function(msg) {
-				$ionicPopup.alert({
-					title: 'Twitter start match',
-					template: 'error: ' + msg
-				});
+		if( variables.twitterSetting.value ) {
+			//eg #teamname Firstname lastname 12' / 1 - 0
+			//	! thuismatch of niet
+			var msg = '#' + currentMatchService.currentMatch.team.name.split(' ').join('_') + ' ';
+			if( currentMatchService.currentMatch.home ) {
+				msg = msg + currentMatchService.currentMatch.team.name + ' - ' + currentMatchService.currentMatch.opponent;
+			} else {			
+				msg = msg + currentMatchService.currentMatch.opponent + ' - ' + currentMatchService.currentMatch.team.name;
 			}
-		);
+			console.log('twitter msg: ' + msg);
+			window.plugins.socialsharing.shareViaTwitter(msg, 
+				null, //subject
+				null, //file
+				null, //link 
+				function(){console.log('share ok')}, 
+				function(msg) {
+					$ionicPopup.alert({
+						title: 'Twitter start match',
+						template: 'error: ' + msg
+					});
+				}
+			);
+		}
+	};
+
+	$scope.doTwitterEndMatch = function() {
+		if( variables.twitterSetting.value ) {
+			//eg #teamname Firstname lastname 12' / 1 - 0
+			//	! thuismatch of niet
+			var msg = '#' + currentMatchService.currentMatch.team.name.split(' ').join('_') + ' ';
+			if( currentMatchService.currentMatch.home ) {
+				msg = msg + currentMatchService.currentMatch.team.name + ' - ' + currentMatchService.currentMatch.opponent;
+			} else {			
+				msg = msg + currentMatchService.currentMatch.opponent + ' - ' + currentMatchService.currentMatch.team.name;
+			}
+			msg = msg + ' Match ended with score: ';
+			if( currentMatchService.currentMatch.home ) {
+				msg = msg + $scope.lastGoal.scoreMyTeam + ' - ' + $scope.lastGoal.scoreOpponent;
+			} else {			
+				msg = msg + $scope.lastGoal.scoreOpponent + ' - ' + $scope.lastGoal.scoreMyTeam;
+			}
+			console.log('twitter msg: ' + msg);
+			window.plugins.socialsharing.shareViaTwitter(msg, 
+				null, //subject
+				null, //file
+				null, //link 
+				function(){console.log('share ok')}, 
+				function(msg) {
+					$ionicPopup.alert({
+						title: 'Twitter start match',
+						template: 'error: ' + msg
+					});
+				}
+			);
+		}
 	};
 	
 	$scope.startPeriod = function() { 
@@ -803,6 +961,26 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 
 		MatchService.insertMatch(currentMatchService.currentMatch, success, error);
 	};
+	
+	$scope.goHome = function() {
+		console.log("MatchController.goHome called");
+
+		if( $scope.isSaved == false ) {
+			var confirmPopup = $ionicPopup.confirm({
+				title: 'Leave without saving?',
+				template: 'Are you sure you want to leave without saving the match?'
+			});
+			confirmPopup.then(function(res) {
+				if(res) {
+					$location.path('/');
+				} else {
+	       			console.log('You are not sure');
+	     		}
+     		});
+    	} else {
+    		$location.path('/');
+    	}
+	};
 
 	function success()  {
 		$scope.$apply(
@@ -815,6 +993,8 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 				});
 			}
 		);
+		$scope.isSaved = true;
+		$scope.doTwitterEndMatch();
 	};
 
 	function error(err) {
@@ -847,4 +1027,56 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 .controller('MatchDetailController', function($scope, currentMatchService) {
 
 	$scope.currentMatch = currentMatchService.currentMatch;
+})
+
+/*
+   SSSSSSSSSSSSSSS                              tttt               tttt            iiii                                                                CCCCCCCCCCCCC                                            tttt                                              lllllll lllllll                                         
+ SS:::::::::::::::S                          ttt:::t            ttt:::t           i::::i                                                            CCC::::::::::::C                                         ttt:::t                                              l:::::l l:::::l                                         
+S:::::SSSSSS::::::S                          t:::::t            t:::::t            iiii                                                           CC:::::::::::::::C                                         t:::::t                                              l:::::l l:::::l                                         
+S:::::S     SSSSSSS                          t:::::t            t:::::t                                                                          C:::::CCCCCCCC::::C                                         t:::::t                                              l:::::l l:::::l                                         
+S:::::S                eeeeeeeeeeee    ttttttt:::::tttttttttttttt:::::ttttttt    iiiiiiinnnn  nnnnnnnn       ggggggggg   ggggg    ssssssssss    C:::::C       CCCCCC   ooooooooooo   nnnn  nnnnnnnn    ttttttt:::::ttttttt   rrrrr   rrrrrrrrr      ooooooooooo    l::::l  l::::l     eeeeeeeeeeee    rrrrr   rrrrrrrrr   
+S:::::S              ee::::::::::::ee  t:::::::::::::::::tt:::::::::::::::::t    i:::::in:::nn::::::::nn    g:::::::::ggg::::g  ss::::::::::s  C:::::C               oo:::::::::::oo n:::nn::::::::nn  t:::::::::::::::::t   r::::rrr:::::::::r   oo:::::::::::oo  l::::l  l::::l   ee::::::::::::ee  r::::rrr:::::::::r  
+ S::::SSSS          e::::::eeeee:::::eet:::::::::::::::::tt:::::::::::::::::t     i::::in::::::::::::::nn  g:::::::::::::::::gss:::::::::::::s C:::::C              o:::::::::::::::on::::::::::::::nn t:::::::::::::::::t   r:::::::::::::::::r o:::::::::::::::o l::::l  l::::l  e::::::eeeee:::::eer:::::::::::::::::r 
+  SS::::::SSSSS    e::::::e     e:::::etttttt:::::::tttttttttttt:::::::tttttt     i::::inn:::::::::::::::ng::::::ggggg::::::ggs::::::ssss:::::sC:::::C              o:::::ooooo:::::onn:::::::::::::::ntttttt:::::::tttttt   rr::::::rrrrr::::::ro:::::ooooo:::::o l::::l  l::::l e::::::e     e:::::err::::::rrrrr::::::r
+    SSS::::::::SS  e:::::::eeeee::::::e      t:::::t            t:::::t           i::::i  n:::::nnnn:::::ng:::::g     g:::::g  s:::::s  ssssss C:::::C              o::::o     o::::o  n:::::nnnn:::::n      t:::::t          r:::::r     r:::::ro::::o     o::::o l::::l  l::::l e:::::::eeeee::::::e r:::::r     r:::::r
+       SSSSSS::::S e:::::::::::::::::e       t:::::t            t:::::t           i::::i  n::::n    n::::ng:::::g     g:::::g    s::::::s      C:::::C              o::::o     o::::o  n::::n    n::::n      t:::::t          r:::::r     rrrrrrro::::o     o::::o l::::l  l::::l e:::::::::::::::::e  r:::::r     rrrrrrr
+            S:::::Se::::::eeeeeeeeeee        t:::::t            t:::::t           i::::i  n::::n    n::::ng:::::g     g:::::g       s::::::s   C:::::C              o::::o     o::::o  n::::n    n::::n      t:::::t          r:::::r            o::::o     o::::o l::::l  l::::l e::::::eeeeeeeeeee   r:::::r            
+            S:::::Se:::::::e                 t:::::t    tttttt  t:::::t    tttttt i::::i  n::::n    n::::ng::::::g    g:::::g ssssss   s:::::s  C:::::C       CCCCCCo::::o     o::::o  n::::n    n::::n      t:::::t    ttttttr:::::r            o::::o     o::::o l::::l  l::::l e:::::::e            r:::::r            
+SSSSSSS     S:::::Se::::::::e                t::::::tttt:::::t  t::::::tttt:::::ti::::::i n::::n    n::::ng:::::::ggggg:::::g s:::::ssss::::::s  C:::::CCCCCCCC::::Co:::::ooooo:::::o  n::::n    n::::n      t::::::tttt:::::tr:::::r            o:::::ooooo:::::ol::::::ll::::::le::::::::e           r:::::r            
+S::::::SSSSSS:::::S e::::::::eeeeeeee        tt::::::::::::::t  tt::::::::::::::ti::::::i n::::n    n::::n g::::::::::::::::g s::::::::::::::s    CC:::::::::::::::Co:::::::::::::::o  n::::n    n::::n      tt::::::::::::::tr:::::r            o:::::::::::::::ol::::::ll::::::l e::::::::eeeeeeee   r:::::r            
+S:::::::::::::::SS   ee:::::::::::::e          tt:::::::::::tt    tt:::::::::::tti::::::i n::::n    n::::n  gg::::::::::::::g  s:::::::::::ss       CCC::::::::::::C oo:::::::::::oo   n::::n    n::::n        tt:::::::::::ttr:::::r             oo:::::::::::oo l::::::ll::::::l  ee:::::::::::::e   r:::::r            
+ SSSSSSSSSSSSSSS       eeeeeeeeeeeeee            ttttttttttt        ttttttttttt  iiiiiiii nnnnnn    nnnnnn    gggggggg::::::g   sssssssssss            CCCCCCCCCCCCC   ooooooooooo     nnnnnn    nnnnnn          ttttttttttt  rrrrrrr               ooooooooooo   llllllllllllllll    eeeeeeeeeeeeee   rrrrrrr            
+                                                                                                                      g:::::g                                                                                                                                                                                             
+                                                                                                          gggggg      g:::::g                                                                                                                                                                                             
+                                                                                                          g:::::gg   gg:::::g                                                                                                                                                                                             
+                                                                                                           g::::::ggg:::::::g                                                                                                                                                                                             
+                                                                                                            gg:::::::::::::g                                                                                                                                                                                              
+                                                                                                              ggg::::::ggg                                                                                                                                                                                                
+                                                                                                                 gggggg                                                                                                                                                                                                   
+*/
+.controller('SettingsController', function($scope, SettingsService) {
+	$scope.twitter = variables.twitterSetting;
+
+	$scope.change = function(setting) {
+		if( setting.id == null ) {
+			setting = new Setting(-1, variables.TWITTER, setting.value);
+
+			SettingsService.insertSetting(setting, success, error);
+		} else {
+			SettingsService.updateSetting(setting, success, error);
+		}
+	}
+
+	function success()  {
+		console.log("SettingsController.success called");
+		variables.twitterSetting = $scope.twitter;
+	};
+
+	function error(err) {
+    	console.log("Error processing SQL: " + angular.toJson(err));
+		$ionicPopup.alert({
+			title: 'Save Match',
+			template: 'Database Error: ' + angular.toJson(err)
+		});
+	};
 });
