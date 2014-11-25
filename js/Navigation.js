@@ -112,7 +112,7 @@ RRRRRRRR     RRRRRRR    uuuuuuuu  uuuunnnnnn    nnnnnn*/
 	};
 
 	//When the app comes back from background => eg update screen
-	window.addEventListener("resume", function () {
+	$document.on("resume", function ( event ) {
 		console.log("resume called");
 		$rootScope.$broadcast("resumecalled");
 	});
@@ -155,43 +155,15 @@ HHHHHHHHH     HHHHHHHHH   ooooooooooo   mmmmmm   mmmmmm   mmmmmm    eeeeeeeeeeee
 		}
 
 		currentMatchService.initDone = true;
-
-
-		$scope.fileData = variables.savedData;
 	});
 
 		    	console.log("HomeController.barFooter called");
 	$("#barFooter").show();
 	screen.unlockOrientation();
 
-	$scope.clickListItem = function(match) {
-		currentMatchService.currentMatch = match;
-		//console.log("match:" + angular.toJson(currentMatchService.currentMatch));
-
-		var hideSheet = $ionicActionSheet.show({
-			buttons: [
-				{ text: 'Show' },
-				{ text: 'Edit' }
-			],
-			destructiveText: 'Delete',
-			titleText: 'Actions on match',
-			cancelText: 'Cancel',
-			cancel: function() {
-				// add cancel code..
-			},
-			buttonClicked: function(index) {
-				if( index == 0 ) {
-					//Show
-					//currentMatch is set on Service
-					MatchService.getMatchById(match, successForward, error);
-				}
-				return true;
-			},
-			destructiveButtonClicked: function() {
-				//delete 
-				return true;
-			},
-		});
+	
+	$scope.details = function(match) {
+		MatchService.getMatchById(match, successForward, error);
 	};
 
 	$scope.insertMatches = function(match) {
