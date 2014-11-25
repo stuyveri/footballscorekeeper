@@ -100,7 +100,7 @@ R::::::R     R:::::R u:::::::::::::::un::::n    n::::n
 R::::::R     R:::::R  uu::::::::uu:::un::::n    n::::n
 RRRRRRRR     RRRRRRR    uuuuuuuu  uuuunnnnnn    nnnnnn*/
 
-.run(function($rootScope, currentMatchService){
+.run(function($rootScope, $document, currentMatchService){
 	$rootScope.generateUUID = function() {
     	var d = new Date().getTime();
     	var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
