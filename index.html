@@ -105,15 +105,16 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 -->        
         
         <script id="templates/newMatch.html" type="text/ng-template">
-			<ion-view title="newMatch" ng-controller="SoccerController">
+			<ion-view title="newMatch">
 					<form name="frmNewMatch" novalidate>
 				    	<div class="bar bar-header bar-balanced" id="barHeader">
 							<button class="button icon-left ion-chevron-left button-clear" onclick="window.location = '#/'"></button>
 							<h1 class="title">New Match</h1>
-							<button type="submit" class="button button-clear" ng-click="startMatch()" ng-disabled="frmNewMatch.$invalid">Start</button>
+							<button class="button button-clear" onclick="document.getElementById('btnFrmSubmit').click();" ng-disabled="frmNewMatch.$invalid">Start</button>
 						</div>
+						<ion-content ng-controller="SoccerController">
 			        		<div class="app">
-					        	<br/>
+					        	<br ng-if="checked"/>
 					        	<br/>
 					        	<br/>
 					        	<div>
@@ -123,8 +124,8 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 											<option value="">-- choose team --</option>
 										</select>
 							        </label>
-					        		<label class="item item-input is-required{{ frmNewMatch.txtOpponent.$error.required ? ' has-error' : '' }}" id="lblOpponent">
-					        			<input type="text" ng-model="opponent" id="txtOpponent" name="txtOpponent" placeholder="Opponent" ng-required="true" ng-minlength="1" ng-maxlength="50"/>
+					        		<label class="item item-input is-required{{ ( frmNewMatch.txtOpponent.$error.required || frmNewMatch.txtOpponent.$error.maxlength ) ? ' has-error' : '' }}" id="lblOpponent">
+					        			<input type="text" ng-model="opponent" id="txtOpponent" name="txtOpponent" placeholder="Opponent" ng-required="true" ng-maxlength="50"/>
 					        		</label>
 					        		<label id="lblDate" class="item item-input is-required{{ frmNewMatch.txtDate.$error.required ? ' has-error' : '' }}">
 					        			<input type="date" id="txtDate" name="txtDate" placeholder="Date" ng-model="today" ng-required="true"/>
@@ -168,7 +169,9 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 					        	<br/>
 					        	<br/>
 					        	<br/>
+								<button id="btnFrmSubmit" class="button button-clear" ng-click="startMatch()" ng-disabled="frmNewMatch.$invalid"></button>
 					        </div>
+						</ion-content>
 			        </form>
 			</ion-view>
 		</script>
