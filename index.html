@@ -72,13 +72,14 @@ HHHHHHHHH     HHHHHHHHH   ooooooooooo   mmmmmm   mmmmmm   mmmmmm    eeeeeeeeeeee
 								</div>
 							</div>
 						</div>
-			        </div><!--
+			        </div>
 			        	<br/>
 			        	<br/>
 			        	<br/>
 			        	<br/>
 			        	<br/>
 			        	<br/>
+			        	<!--
 			        		<button class="button button-stable" ng-click="insertMatches()">Insert Matches</button>
 			        	-->
 				</ion-content>
@@ -114,7 +115,7 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 						</div>
 						<ion-content ng-controller="SoccerController">
 			        		<div class="app">
-					        	<br ng-if="checked"/>
+					        	<br/>
 					        	<br/>
 					        	<br/>
 					        	<div>
@@ -351,8 +352,10 @@ TTTTTT  T:::::T  TTTTTTeeeeeeeeeeee    aaaaaaaaaaaaa      mmmmmmm    mmmmmmm    
 	        		<label class="item item-input">
 	        			<input type="text" id="txtNewTeam" placeholder="Team Name" ng-model="teamName"/>
 	        		</label>
-			        <button class="button button-stable" ng-click="addTeam()" id="btnAddTeam">Add Team</button>
-			        <button class="button button-stable" ng-click="updateTeam()" id="btnUpdateTeam" style="display:none">Update Team</button>
+		        	<br/>
+		        	<br/>
+			        <button class="button button-full button-balanced" ng-click="addTeam()" id="btnAddTeam">Add Team</button>
+			        <button class="button button-full button-balanced" ng-click="updateTeam()" id="btnUpdateTeam" style="display:none">Update Team</button>
 				</ion-content>
 			</ion-view>
 		</script>
@@ -461,8 +464,10 @@ PPPPPPPPPP          llllllll  aaaaaaaaaa  aaaa    y:::::y            eeeeeeeeeee
 	        		<label class="item item-input">
 	        			<input type="text" placeholder="Player lastname" ng-model="lastName"/>
 	        		</label>
-			        <button class="button button-stable" ng-click="addPlayer()" id="btnAddPlayer" >Add Player</button>
-			        <button class="button button-stable" ng-click="updatePlayer()" id="btnUpdatePlayer" style="display:none">Update Player</button>
+		        	<br/>
+		        	<br/>
+			        <button class="button button-full button-balanced" ng-click="addPlayer()" id="btnAddPlayer" >Add Player</button>
+			        <button class="button button-full button-balanced" ng-click="updatePlayer()" id="btnUpdatePlayer" style="display:none">Update Player</button>
 				</ion-content>
 			</ion-view>
 		</script>
@@ -483,7 +488,11 @@ PPPPPPPPPP          llllllll  aaaaaaaaaa  aaaa    y:::::y            eeeeeeeeeee
 					<ion-list>
 						<ion-item ng-repeat="team in teams" ng-click="goToTeam(team)">{{team.name}}</ion-item>
 					</ion-list>
+		        	<br/>
+		        	<br/>
 				    <button class="button button-full button-balanced" >Matches: {{ player.nrOfMatches }}</button>
+		        	<br/>
+		        	<br/>
 				    <button class="button button-full button-balanced" >Goals: {{ player.nrOfGoals }}</button>
 				</ion-content>
 			</ion-view>
