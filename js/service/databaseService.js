@@ -38,6 +38,16 @@ function onDeviceReadyForDatabase() {
 			successCB
 		);
 	}
+
+	window.location = "#/";
+}
+
+function errorCB(err) {
+    console.log("Error processing SQL: "+ angular.toJson(err) );
+}
+
+function successCB() {
+    console.log("SQL success!");
 	//Check if on latest version
 	if( variables.db.version != variables.databaseVersion ) {
 		console.log("updating database from/to: " + variables.db.version + "/1.2");
@@ -51,16 +61,6 @@ function onDeviceReadyForDatabase() {
 			successCB
 		);
 	}
-
-	window.location = "#/";
-}
-
-function errorCB(err) {
-    console.log("Error processing SQL: "+ angular.toJson(err) );
-}
-
-function successCB() {
-    console.log("SQL success!");
 }
 
 function booleanToSql(val) {

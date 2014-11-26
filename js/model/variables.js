@@ -2,6 +2,7 @@ var variables = {
 	savedData : null,
 	databaseVersion : "1.2",
 	TWITTER : "TWITTER",
+	LANGUAGE_PREF : "LANGUAGE_PREF",
 	//1.1: 
 	//		Id added
 	//		myTeamPlayers
@@ -17,6 +18,7 @@ var variables = {
 	playerNrOfMatches : 0,
 	playerNrOfGoals : 0,
 	twitterSetting : {id : null, value : false},
+	preferredLangSetting : {id : null, value : false},
 	teamNrOfGoalsScored : 0,
 	teamNrOfGoalsAgainst : 0,
 	teamTopScorer : null,

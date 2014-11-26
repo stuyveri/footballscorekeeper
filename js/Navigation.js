@@ -1,4 +1,4 @@
-angular.module('SoccerKeeperApp', ['ionic', 'SoccerKeeperApp.services', 'SoccerKeeperApp.playerController'])
+angular.module('SoccerKeeperApp', ['ionic', 'SoccerKeeperApp.services', 'SoccerKeeperApp.playerController', 'SoccerKeeperApp.translationService'])
 .config(function($stateProvider) {
   $stateProvider
   .state('index', {
@@ -217,6 +217,12 @@ HHHHHHHHH     HHHHHHHHH   ooooooooooo   mmmmmm   mmmmmm   mmmmmm    eeeeeeeeeeee
 				if( setting.name == variables.TWITTER ) {
 					console.log("HomeController.successAllSettings TWITTER found");
 					variables.twitterSetting = setting;
+
+					variables.twitterSetting.value = SqlToBoolean(variables.twitterSetting.value);
+				}
+				if( setting.name == variables.LANGUAGE_PREF ) {
+					console.log("HomeController.successAllSettings LANGUAGE_PREF found");
+					variables.preferredLangSetting = setting;
 				}
 			})
 		);
@@ -250,25 +256,27 @@ TTTTTT  T:::::T  TTTTTTeeeeeeeeeeee    aaaaaaaaaaaaa      mmmmmmm    mmmmmmm    
       TTTTTTTTTTT      eeeeeeeeeeeeee  aaaaaaaaaa  aaaammmmmm   mmmmmm   mmmmmm  sssssssssss            CCCCCCCCCCCCC   ooooooooooo     nnnnnn    nnnnnn          ttttttttttt  rrrrrrr               ooooooooooo   llllllllllllllll    eeeeeeeeeeeeee   rrrrrrr            
 */
 
-.controller('TeamsController', function($scope, $location, $ionicPopup, $ionicActionSheet, TeamService) {
+.controller('TeamsController', function($scope, $location, $ionicPopup, $ionicActionSheet, $translate, TeamService) {
 	$scope.teams = TeamService.teams;
 
 	TeamService.getAllTeams(success, error);
 	
 	$scope.delete = function(team) {
-		// Show the action sheet
-		var hideSheet = $ionicActionSheet.show({
-			buttons: [],
-			destructiveText: 'Delete',
-			titleText: 'Are you sure?',
-			cancelText: 'Cancel',
-			cancel: function() {
-				// add cancel code..
-			},
-			destructiveButtonClicked: function() {
-				TeamService.deleteTeam(team, successRefresh, error);
-				return true;
-			}
+		$translate(['TEAMS_ACTION_DESTRUCTIVE', 'TEAMS_ACTION_TITLE', 'TEAMS_ACTION_CANCEL']).then(function (translations) {
+			// Show the action sheet
+			$ionicActionSheet.show({
+				buttons: [],
+				destructiveText: translations.TEAMS_ACTION_DESTRUCTIVE,
+				titleText: translations.TEAMS_ACTION_TITLE,
+				cancelText: translations.TEAMS_ACTION_CANCEL,
+				cancel: function() {
+					// add cancel code..
+				},
+				destructiveButtonClicked: function() {
+					TeamService.deleteTeam(team, successRefresh, error);
+					return true;
+				}
+			});
 		});
 	};
 	
@@ -330,7 +338,7 @@ TTTTTT  T:::::T  TTTTTTeeeeeeeeeeee    aaaaaaaaaaaaa      mmmmmmm    mmmmmmm    
       TTTTTTTTTTT      eeeeeeeeeeeeee  aaaaaaaaaa  aaaammmmmm   mmmmmm   mmmmmm        CCCCCCCCCCCCC   ooooooooooo     nnnnnn    nnnnnn          ttttttttttt  rrrrrrr               ooooooooooo   llllllllllllllll    eeeeeeeeeeeeee   rrrrrrr            
 */
 
-.controller('TeamController', function($scope, $location, $ionicPopup, TeamService, PlayerService) {
+.controller('TeamController', function($scope, $location, $ionicPopup, $ionicActionSheet, $translate, TeamService, PlayerService) {
 	$scope.teamName;
 	$scope.team = $location.search();
 	$scope.players;
@@ -385,20 +393,22 @@ TTTTTT  T:::::T  TTTTTTeeeeeeeeeeee    aaaaaaaaaaaaa      mmmmmmm    mmmmmmm    
 
 	$scope.deletePlayer = function(player) {
 
-		// Show the action sheet
-		var hideSheet = $ionicActionSheet.show({
-			buttons: [],
-			destructiveText: 'Delete',
-			titleText: 'Are you sure?',
-			cancelText: 'Cancel',
-			cancel: function() {
-				// add cancel code..
-			},
-			destructiveButtonClicked: function() {
-				TeamService.removePlayerFromTeam($scope.team, player, successAddPlayer, error);
-				PlayerService.getPlayersForTeam($scope.team, successRefreshTeamPlayers, error);
-				return true;
-			}
+		$translate(['DELETE_PLAYER_ACTION_DESTRUCTIVE', 'DELETE_PLAYER_ACTION_TITLE', 'DELETE_PLAYER_ACTION_CANCEL']).then(function (translations) {
+			// Show the action sheet
+			$ionicActionSheet.show({
+				buttons: [],
+				destructiveText: translations.DELETE_PLAYER_ACTION_DESTRUCTIVE,
+				titleText: translations.DELETE_PLAYER_ACTION_TITLE,
+				cancelText: translations.DELETE_PLAYER_ACTION_CANCEL,
+				cancel: function() {
+					// add cancel code..
+				},
+				destructiveButtonClicked: function() {
+					TeamService.removePlayerFromTeam($scope.team, player, successAddPlayer, error);
+					PlayerService.getPlayersForTeam($scope.team, successRefreshTeamPlayers, error);
+					return true;
+				}
+			});
 		});
 	}
 
@@ -1026,13 +1036,25 @@ S:::::::::::::::SS   ee:::::::::::::e          tt:::::::::::tt    tt:::::::::::t
                                                                                                               ggg::::::ggg                                                                                                                                                                                                
                                                                                                                  gggggg                                                                                                                                                                                                   
 */
-.controller('SettingsController', function($scope, SettingsService) {
+.controller('SettingsController', function($scope, $translate, $ionicPopup, SettingsService) {
 	$scope.twitter = variables.twitterSetting;
+	$scope.preferredLang = variables.preferredLangSetting;
 
-	$scope.change = function(setting) {
+	$scope.changeTwitter = function(setting) {
+		var temp = angular.copy(setting);
+		temp.value = booleanToSql(setting.value);
+		$scope.change(temp, variables.TWITTER);
+	}
+
+	$scope.changeLang = function(setting) {
+		$scope.change(setting, variables.LANGUAGE_PREF);
+		$translate.use(setting.value);
+	}
+
+	$scope.change = function(setting, name) {
+		console.log("SettingsController.change called for : " + name + " & value : " + setting.value);
 		if( setting.id == null ) {
-			setting = new Setting(-1, variables.TWITTER, setting.value);
-
+			setting = new Setting(-1, name, setting.value);
 			SettingsService.insertSetting(setting, success, error);
 		} else {
 			SettingsService.updateSetting(setting, success, error);
@@ -1042,6 +1064,7 @@ S:::::::::::::::SS   ee:::::::::::::e          tt:::::::::::tt    tt:::::::::::t
 	function success()  {
 		console.log("SettingsController.success called");
 		variables.twitterSetting = $scope.twitter;
+		variables.preferredLangSetting = $scope.preferredLang;
 	};
 
 	function error(err) {

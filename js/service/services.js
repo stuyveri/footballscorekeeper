@@ -799,7 +799,7 @@ S:::::::::::::::SS   ee:::::::::::::e          tt:::::::::::tt    tt:::::::::::t
 
 			variables.db.transaction(function(tx) {
 
-					tx.executeSql('INSERT INTO Setting(Name, Value) VALUES ("' + setting.name + '", "' + booleanToSql(setting.value) + '")'); 
+					tx.executeSql('INSERT INTO Setting(Name, Value) VALUES ("' + setting.name + '", "' + setting.value + '")'); 
 				}, 
 				fnError, 
 				fnSuccess
@@ -809,7 +809,7 @@ S:::::::::::::::SS   ee:::::::::::::e          tt:::::::::::tt    tt:::::::::::t
 
 			variables.db.transaction(function(tx) {
 
-					tx.executeSql('UPDATE Setting SET Name = "' + setting.name + '", Value = "' + booleanToSql(setting.value) + '" WHERE Id = ' + setting.id); 
+					tx.executeSql('UPDATE Setting SET Name = "' + setting.name + '", Value = "' + setting.value + '" WHERE Id = ' + setting.id); 
 				}, 
 				fnError, 
 				fnSuccess
@@ -821,7 +821,7 @@ S:::::::::::::::SS   ee:::::::::::::e          tt:::::::::::tt    tt:::::::::::t
 		//Empty array but not re-init it!! otherwise it does not work
 	    _settings.length = 0;
 		for (var i=0; i<results.rows.length; i++){
-			_settings.push( new Setting(results.rows.item(i).Id, results.rows.item(i).Name, SqlToBoolean(results.rows.item(i).Value)) );
+			_settings.push( new Setting(results.rows.item(i).Id, results.rows.item(i).Name, results.rows.item(i).Value) );
 		}
 
 		console.log("doSettings: " + angular.toJson(_settings) );
