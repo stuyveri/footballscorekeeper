@@ -203,7 +203,7 @@ HHHHHHHHH     HHHHHHHHH   ooooooooooo   mmmmmm   mmmmmm   mmmmmm    eeeeeeeeeeee
 		    	console.log("HomeController.successGetIds called");
 
 				currentMatchService.matchId = variables.maxMatchId;
-				currentMatchService.periodId = variables.maxPeriodId;
+				currentMatchService.periodId = variables.maxPeriodId; 
 				currentMatchService.goalId = variables.maxGoalId;
 				currentMatchService.matchPlayerId = variables.maxMatchPlayerId;
 
