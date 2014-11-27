@@ -68,6 +68,16 @@ angular.module('SoccerKeeperApp.translationService', ['pascalprecht.translate'])
       TEAM_RIBBON_PLAYERS: 'Spelers:',
       TEAM_DELETE: 'Del'
   	});
-  	$translateProvider.preferredLanguage('nl');
+  	$translateProvider.preferredLanguage('en');
     $translateProvider.fallbackLanguage('en');
-});
+})
+
+
+.service('translationService', ['$translate', function($translate) {
+
+   return {
+      setPreferredLanguage: function(lang) {
+        $translate.use(lang);
+      }
+   };
+}]);

@@ -1,4 +1,4 @@
-angular.module('SoccerKeeperApp', ['ionic', 'SoccerKeeperApp.services', 'SoccerKeeperApp.playerController', 'SoccerKeeperApp.translationService'])
+angular.module('SoccerKeeperApp', ['ionic', 'SoccerKeeperApp.services', 'SoccerKeeperApp.playerController', 'SoccerKeeperApp.translationService', 'SoccerKeeperApp.translationService'])
 .config(function($stateProvider) {
   $stateProvider
   .state('index', {
@@ -100,7 +100,7 @@ R::::::R     R:::::R u:::::::::::::::un::::n    n::::n
 R::::::R     R:::::R  uu::::::::uu:::un::::n    n::::n
 RRRRRRRR     RRRRRRR    uuuuuuuu  uuuunnnnnn    nnnnnn*/
 
-.run(function($rootScope, $document, currentMatchService){
+.run(function($rootScope, $ionicPlatform, $document, currentMatchService){
 	$rootScope.generateUUID = function() {
     	var d = new Date().getTime();
     	var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -111,10 +111,12 @@ RRRRRRRR     RRRRRRR    uuuuuuuu  uuuunnnnnn    nnnnnn*/
     	return uuid;
 	};
 
-	//When the app comes back from background => eg update screen
-	$document.on("resume", function ( event ) {
-		console.log("resume called");
-		$rootScope.$broadcast("resumecalled");
+	$ionicPlatform.ready(function () {
+		//When the app comes back from background => eg update screen
+		$document.on("resume", function ( event ) {
+			console.log("resume called");
+			$rootScope.$broadcast("resumecalled");
+		});
 	});
 })
 
@@ -137,7 +139,7 @@ H:::::::H     H:::::::H oo:::::::::::oo m::::m   m::::m   m::::m  ee::::::::::::
 HHHHHHHHH     HHHHHHHHH   ooooooooooo   mmmmmm   mmmmmm   mmmmmm    eeeeeeeeeeeeee          CCCCCCCCCCCCC   ooooooooooo     nnnnnn    nnnnnn          ttttttttttt  rrrrrrr               ooooooooooo   llllllllllllllll    eeeeeeeeeeeeee   rrrrrrr            
 */
 
-.controller('HomeController', function($scope, $ionicActionSheet, $location, $ionicPlatform, $ionicPopup, currentMatchService, MatchService, SettingsService) {
+.controller('HomeController', function($scope, $ionicActionSheet, $location, $ionicPlatform, $ionicPopup, translationService, currentMatchService, MatchService, SettingsService) {
 	$scope.teams;
 	$scope.fileData;
 
@@ -223,6 +225,8 @@ HHHHHHHHH     HHHHHHHHH   ooooooooooo   mmmmmm   mmmmmm   mmmmmm    eeeeeeeeeeee
 				if( setting.name == variables.LANGUAGE_PREF ) {
 					console.log("HomeController.successAllSettings LANGUAGE_PREF found");
 					variables.preferredLangSetting = setting;
+					//set preferred language
+					translationService.setPreferredLanguage(variables.preferredLangSetting.value);
 				}
 			})
 		);

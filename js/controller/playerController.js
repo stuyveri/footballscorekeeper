@@ -117,9 +117,6 @@ PPPPPPPPPP          llllllll  aaaaaaaaaa  aaaa    y:::::y            eeeeeeeeeee
 	$scope.player = $location.search();
 	$scope.teams;
 
-	PlayerService.getNrOfMatches($scope.player, successNrOfMatches, error);
-	PlayerService.getNrOfGoals($scope.player, successNrOfGoals, error);
-
 	if( $scope.player != null && $scope.player.firstname != null ) {
 		$scope.firstName = $scope.player.firstname;
 		$scope.lastName = $scope.player.lastname;
@@ -128,6 +125,9 @@ PPPPPPPPPP          llllllll  aaaaaaaaaa  aaaa    y:::::y            eeeeeeeeeee
 		$("#btnUpdatePlayer").show();
 
 		TeamService.getTeamsForPlayer($scope.player, successRefresh, error);
+		
+		PlayerService.getNrOfMatches($scope.player, successNrOfMatches, error);
+		PlayerService.getNrOfGoals($scope.player, successNrOfGoals, error);
 	} else {
 		$("#btnAddPlayer").show();
 		$("#btnUpdatePlayer").hide();

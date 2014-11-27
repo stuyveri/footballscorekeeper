@@ -37,6 +37,8 @@ function onDeviceReadyForDatabase() {
 			errorCB, 
 			successCB
 		);
+	} else {
+		successCB();
 	}
 
 	window.location = "#/";
@@ -55,6 +57,9 @@ function successCB() {
 
 		variables.db.transaction(function(tx) {
 				tx.executeSql('CREATE TABLE IF NOT EXISTS Setting (Id INTEGER PRIMARY KEY ASC, Name TEXT UNIQUE, Value TEXT)');
+				//empty player for goals of opponent team
+				tx.executeSql('INSERT INTO Setting(Name, Value) VALUES (' + variables.TWITTER + ', "0")'); 
+				tx.executeSql('INSERT INTO Setting(Name, Value) VALUES (' + variables.LANGUAGE_PREF + ', "en")'); 
 				console.log("Settings done.");
 			}, 
 			errorCB, 

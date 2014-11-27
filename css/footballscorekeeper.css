@@ -11,3 +11,7 @@
 .is-required {
   border-left: 5px solid #cc2511; 
 }
+
+.is-not-required {
+  border-left: 5px solid #FFFFFF; 
+}
