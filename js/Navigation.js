@@ -699,7 +699,11 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 		console.log("resumecalled called");
 
 			alert("resume called .ON");
-		$scope.updateDisplay();
+		$scope.$apply(
+			function() {
+				$scope.updateDisplay();
+			}
+		);
 	});
 
 	$ionicModal.fromTemplateUrl('modal/selectPlayer.html', function($ionicModal) {
