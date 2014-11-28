@@ -115,7 +115,7 @@ RRRRRRRR     RRRRRRR    uuuuuuuu  uuuunnnnnn    nnnnnn*/
 		//When the app comes back from background => eg update screen
 		$document.on("resume", function ( event ) {
 			console.log("resume called");
-			alert("resume called");
+			//alert("resume called");
 			$rootScope.$broadcast("resumecalled");
 		});
 	});
@@ -698,7 +698,7 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 	$scope.$on('resumecalled', function(event, args) {
 		console.log("resumecalled called");
 
-			alert("resume called .ON");
+		//alert("resume called .ON");
 		$scope.$apply(
 			function() {
 				$scope.updateDisplay();
@@ -898,7 +898,7 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 	
 	$scope.updateDisplay = function() {
 		console.log("updateDisplay called.");
-			alert("updateDisplay called .ON");
+		//alert("updateDisplay called .ON");
 		
 		var currentTime = new Date();
 		
