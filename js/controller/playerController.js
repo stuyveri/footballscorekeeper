@@ -22,7 +22,7 @@ PPPPPPPPPP          llllllll  aaaaaaaaaa  aaaa    y:::::y            eeeeeeeeeee
                                               y:::::y                                                                                                                                                                                                                                                
                                              yyyyyyy                                                                                                                                                                                                                                                 
 */
-.controller('PlayersController', function($scope, $location, $ionicPopup, $ionicActionSheet, PlayerService) {
+.controller('PlayersController', function($scope, $location, $ionicPopup, $ionicActionSheet, $translate, PlayerService) {
 
 	$scope.players = PlayerService.players;
 	
@@ -33,19 +33,21 @@ PPPPPPPPPP          llllllll  aaaaaaaaaa  aaaa    y:::::y            eeeeeeeeeee
 	PlayerService.getAllPlayers(success, error);
 	
 	$scope.delete = function(player) {
-		// Show the action sheet
-		var hideSheet = $ionicActionSheet.show({
-			buttons: [],
-			destructiveText: 'Delete',
-			titleText: 'Are you sure?',
-			cancelText: 'Cancel',
-			cancel: function() {
-				// add cancel code..
-			},
-			destructiveButtonClicked: function() {
-				PlayerService.deletePlayer(player, successRefresh, error);
-				return true;
-			}
+		$translate(['PLAYERS_ACTION_DESTRUCTIVE', 'PLAYERS_ACTION_TITLE', 'PLAYERS_ACTION_CANCEL']).then(function (translations) {
+			// Show the action sheet
+			var hideSheet = $ionicActionSheet.show({
+				buttons: [],
+				destructiveText: translations.PLAYERS_ACTION_DESTRUCTIVE,
+				titleText: translations.PLAYERS_ACTION_TITLE,
+				cancelText: translations.PLAYERS_ACTION_CANCEL,
+				cancel: function() {
+					// add cancel code..
+				},
+				destructiveButtonClicked: function() {
+					PlayerService.deletePlayer(player, successRefresh, error);
+					return true;
+				}
+			});
 		});
 	};
 	

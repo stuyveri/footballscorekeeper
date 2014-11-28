@@ -203,7 +203,7 @@ HHHHHHHHH     HHHHHHHHH   ooooooooooo   mmmmmm   mmmmmm   mmmmmm    eeeeeeeeeeee
 		    	console.log("HomeController.successGetIds called");
 
 				currentMatchService.matchId = variables.maxMatchId;
-				currentMatchService.periodId = variables.maxPeriodId; 
+				currentMatchService.periodId = variables.maxPeriodId;
 				currentMatchService.goalId = variables.maxGoalId;
 				currentMatchService.matchPlayerId = variables.maxMatchPlayerId;
 
@@ -513,7 +513,7 @@ S:::::::::::::::SS  oo:::::::::::oo   cc:::::::::::::::c  cc:::::::::::::::c  ee
  SSSSSSSSSSSSSSS      ooooooooooo       cccccccccccccccc    cccccccccccccccc    eeeeeeeeeeeeee   rrrrrrr                    CCCCCCCCCCCCC   ooooooooooo     nnnnnn    nnnnnn          ttttttttttt  rrrrrrr               ooooooooooo   llllllllllllllll    eeeeeeeeeeeeee   rrrrrrr            
 */
 
-.controller('SoccerController', function($scope, $ionicPopup, $location, $compile, currentMatchService, TeamService, PlayerService) {
+.controller('SoccerController', function($scope, $ionicPopup, $location, $compile, $translate, currentMatchService, TeamService, PlayerService) {
 	$scope.today = new Date();
 	$scope.periodCounter = 3; //Start at 3 as the first 2 are already in the page
 	$scope.isHome = true;
@@ -614,9 +614,11 @@ S:::::::::::::::SS  oo:::::::::::oo   cc:::::::::::::::c  cc:::::::::::::::c  ee
 		if( valid ) {
 			$location.path('/startMatch');
 		} else {
-			$ionicPopup.alert({
-				title: 'Players',
-				template: 'No players selected!'
+			$translate(['SOCCER_STARTMATCH_POPUP_TITLE', 'SOCCER_STARTMATCH_POPUP_TEMPLATE']).then(function (translations) {
+				$ionicPopup.alert({
+					title: translations.SOCCER_STARTMATCH_POPUP_TITLE,
+					template: translations.SOCCER_STARTMATCH_POPUP_TEMPLATE
+				});
 			});
 		}
 	};
@@ -673,7 +675,7 @@ M::::::M               M::::::Ma:::::aaaa::::::a      tt::::::::::::::t c:::::::
 M::::::M               M::::::M a::::::::::aa:::a       tt:::::::::::tt  cc:::::::::::::::ch:::::h     h:::::h     CCC::::::::::::C oo:::::::::::oo   n::::n    n::::n        tt:::::::::::ttr:::::r             oo:::::::::::oo l::::::ll::::::l  ee:::::::::::::e   r:::::r            
 MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      cccccccccccccccchhhhhhh     hhhhhhh        CCCCCCCCCCCCC   ooooooooooo     nnnnnn    nnnnnn          ttttttttttt  rrrrrrr               ooooooooooo   llllllllllllllll    eeeeeeeeeeeeee   rrrrrrr            
 */
-.controller('MatchController', function($scope, $location, $ionicPopup, $ionicModal, currentMatchService, PlayerService, MatchService) {
+.controller('MatchController', function($scope, $location, $ionicPopup, $ionicModal, $translate, currentMatchService, PlayerService, MatchService) {
 
 	$scope.currentMatch = currentMatchService.currentMatch;
 	$scope.periodStartTime = currentMatchService.periodStartTime;
@@ -845,7 +847,7 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 				function(){console.log('share ok')}, 
 				function(msg) {
 					$ionicPopup.alert({
-						title: 'Twitter start match',
+						title: 'Twitter end match',
 						template: 'error: ' + msg
 					});
 				}
@@ -878,9 +880,11 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 			$scope.periodCounter++;
 			$scope.currentPeriod = $scope.currentMatch.periods[$scope.periodCounter];
 		} else {
-			$ionicPopup.alert({
-				title: 'Periods',
-				template: 'All periods have passed'
+			$translate(['MATCH_STARTPERIOD_POPUP_TITLE', 'MATCH_STARTPERIOD_POPUP_TEMPLATE']).then(function (translations) {
+				$ionicPopup.alert({
+					title: translations.MATCH_STARTPERIOD_POPUP_TITLE,
+					template: translations.MATCH_STARTPERIOD_POPUP_TEMPLATE
+				});
 			});
 		}
 	};
@@ -920,9 +924,11 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 				$("#btnUpdateDisplay").hide();
 			}
 
-			$ionicPopup.alert({
-				title: 'Periods',
-				template: 'Period is done. Progress to the next one!'
+			$translate(['MATCH_PERIODPASSED_POPUP_TITLE', 'MATCH_PERIODPASSED_POPUP_TEMPLATE']).then(function (translations) {
+				$ionicPopup.alert({
+					title: translations.MATCH_PERIODPASSED_POPUP_TITLE,
+					template: translations.MATCH_PERIODPASSED_POPUP_TEMPLATE
+				});
 			});
 	    }
 	};
@@ -952,17 +958,20 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 		console.log("MatchController.goHome called");
 
 		if( $scope.isSaved == false ) {
-			var confirmPopup = $ionicPopup.confirm({
-				title: 'Leave without saving?',
-				template: 'Are you sure you want to leave without saving the match?'
+			$translate(['MATCH_EXIT_POPUP_TITLE', 'MATCH_EXIT_POPUP_TEMPLATE']).then(function (translations) {
+				var confirmPopup = $ionicPopup.confirm({
+					title: translations.MATCH_EXIT_POPUP_TITLE,
+					template: translations.MATCH_EXIT_POPUP_TEMPLATE
+				});
+				confirmPopup.then(function(res) {
+					if(res) {
+						$location.path('/');
+					} else {
+		       			console.log('You are not sure');
+		     		}
+	     		});
+
 			});
-			confirmPopup.then(function(res) {
-				if(res) {
-					$location.path('/');
-				} else {
-	       			console.log('You are not sure');
-	     		}
-     		});
     	} else {
     		$location.path('/');
     	}
@@ -973,9 +982,11 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 			function() {
 		    	console.log("MatchController.success called");
 
-				$ionicPopup.alert({
-					title: 'Save',
-					template: 'Save Done!'
+				$translate(['MATCH_SAVE_POPUP_TITLE', 'MATCH_SAVE_POPUP_TEMPLATE']).then(function (translations) {
+					$ionicPopup.alert({
+						title: translations.MATCH_SAVE_POPUP_TITLE,
+						template: translations.MATCH_SAVE_POPUP_TEMPLATE
+					});
 				});
 			}
 		);

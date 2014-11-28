@@ -41,7 +41,7 @@ HHHHHHHHH     HHHHHHHHH   ooooooooooo   mmmmmm   mmmmmm   mmmmmm    eeeeeeeeeeee
 			<ion-view title="home">
 		    	<div class="bar bar-header bar-balanced" id="barHeader">
 					<button class="button button-icon icon ion-settings button-clear" onclick="window.location = '#/settings'"></button>
-					<h1 class="title">Score Keeper</h1>
+					<h1 class="title">{{ 'HOME_TITLE' | translate }}</h1>
 					<button class="button button-icon button-clear ion-ios7-football" onclick="window.location = '#/newMatch'" id="idNewMatch"></button>
 				</div>
 				<ion-content ng-controller="HomeController">
@@ -113,8 +113,8 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 					<form name="frmNewMatch" novalidate>
 				    	<div class="bar bar-header bar-balanced" id="barHeader">
 							<button class="button icon-left ion-chevron-left button-clear" onclick="window.location = '#/'"></button>
-							<h1 class="title">New Match</h1>
-							<button class="button button-clear" onclick="document.getElementById('btnFrmSubmit').click();" ng-disabled="frmNewMatch.$invalid">Start</button>
+							<h1 class="title">{{ 'MATCH_NEWMATCH_TITLE' | translate }}</h1>
+							<button class="button button-clear" onclick="document.getElementById('btnFrmSubmit').click();" ng-disabled="frmNewMatch.$invalid">{{ 'MATCH_NEWMATCH_BTN_START' | translate }}</button>
 						</div>
 						<ion-content ng-controller="SoccerController">
 			        		<div class="app">
@@ -123,45 +123,45 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 					        	<br/>
 					        	<div>
 				  					<label id="lblTeam" class="item item-input item-select is-required{{ frmNewMatch.drpTeam.$error.required ? ' has-error' : '' }}">
-									    <div class="input-label">Team:</div>
+									    <div class="input-label">{{ 'MATCH_NEWMATCH_LBL_TEAM' | translate }}</div>
 										<select ng-model="team" id="drpTeam" name="drpTeam" ng-change="teamSelected()" ng-options="team as team.name for team in teams" ng-required="true">
-											<option value="">-- choose team --</option>
+											<option value="">{{ 'MATCH_NEWMATCH_SELECT_CHOOSE_PLAYER' | translate }}</option>
 										</select>
 							        </label>
 					        		<label class="item item-input is-required{{ ( frmNewMatch.txtOpponent.$error.required || frmNewMatch.txtOpponent.$error.maxlength ) ? ' has-error' : '' }}" id="lblOpponent">
-					        			<input type="text" ng-model="opponent" id="txtOpponent" name="txtOpponent" placeholder="Opponent" ng-required="true" ng-maxlength="50"/>
+					        			<input type="text" ng-model="opponent" id="txtOpponent" name="txtOpponent" placeholder="{{ 'MATCH_NEWMATCH_PLACEHOLDER_OPPONENT' | translate }}" ng-required="true" ng-maxlength="50"/>
 					        		</label>
 					        		<label id="lblDate" class="item item-input is-required{{ frmNewMatch.txtDate.$error.required ? ' has-error' : '' }}">
-					        			<input type="date" id="txtDate" name="txtDate" placeholder="Date" ng-model="today" ng-required="true"/>
+					        			<input type="date" id="txtDate" name="txtDate" placeholder="{{ 'MATCH_NEWMATCH_PLACEHOLDER_DATE' | translate }}" ng-model="today" ng-required="true"/>
 					        		</label>
-									<ion-checkbox ng-model="isHome" id="chkHome">Home?</ion-checkbox>
+									<ion-checkbox ng-model="isHome" id="chkHome">{{ 'MATCH_NEWMATCH_CHKBOX_HOME' | translate }}</ion-checkbox>
 					        		<div class="row" id="period1">
 						        		<label class="item item-input is-required{{ frmNewMatch.txtPeriodLen1.$error.required ? ' has-error' : '' }}">
-						        			<span class="input-label">Period 1</span>
-						        			<input type="number" ng-model="txtPeriodLen1" id="txtPeriodLen1" name="txtPeriodLen1" placeholder="Length" ng-required="true"/>
+						        			<span class="input-label">{{ 'MATCH_NEWMATCH_LBL_PERIOD' | translate }}1</span>
+						        			<input type="number" ng-model="txtPeriodLen1" id="txtPeriodLen1" name="txtPeriodLen1" placeholder="{{ 'MATCH_NEWMATCH_PLACEHOLDER_PERIODLEN' | translate }}" ng-required="true"/>
 						        		</label>
 					        		</div>
 					        		<div class="row" id="period2">
 						        		<label class="item item-input is-required{{ frmNewMatch.txtPeriodLen2.$error.required ? ' has-error' : '' }}">
-						        			<span class="input-label">Period 2</span>
-						        			<input type="number" ng-model="txtPeriodLen2" id="txtPeriodLen2" name="txtPeriodLen2" placeholder="Length" ng-required="true"/>
+						        			<span class="input-label">{{ 'MATCH_NEWMATCH_LBL_PERIOD' | translate }}2</span>
+						        			<input type="number" ng-model="txtPeriodLen2" id="txtPeriodLen2" name="txtPeriodLen2" placeholder="{{ 'MATCH_NEWMATCH_PLACEHOLDER_PERIODLEN' | translate }}" ng-required="true"/>
 						        		</label>
 					        		</div>
 					        		<div class="row" id="period3">
 						        		<label class="item item-input is-not-required{{ frmNewMatch.txtPeriodLen3.$error.required ? ' has-error' : '' }}">
-						        			<span class="input-label">Period 3</span>
-						        			<input type="number" ng-model="txtPeriodLen3" id="txtPeriodLen3" name="txtPeriodLen3" placeholder="Length" />
+						        			<span class="input-label">{{ 'MATCH_NEWMATCH_LBL_PERIOD' | translate }}3</span>
+						        			<input type="number" ng-model="txtPeriodLen3" id="txtPeriodLen3" name="txtPeriodLen3" placeholder="{{ 'MATCH_NEWMATCH_PLACEHOLDER_PERIODLEN' | translate }}" />
 						        		</label>
 					        		</div>
 					        		<div class="row" id="period4">
 						        		<label class="item item-input is-not-required{{ frmNewMatch.txtPeriodLen4.$error.required ? ' has-error' : '' }}">
-						        			<span class="input-label">Period 4</span>
-						        			<input type="number" ng-model="txtPeriodLen4" id="txtPeriodLen4" name="txtPeriodLen4" placeholder="Length" />
+						        			<span class="input-label">{{ 'MATCH_NEWMATCH_LBL_PERIOD' | translate }}4</span>
+						        			<input type="number" ng-model="txtPeriodLen4" id="txtPeriodLen4" name="txtPeriodLen4" placeholder="{{ 'MATCH_NEWMATCH_PLACEHOLDER_PERIODLEN' | translate }}" />
 						        		</label>
 					        		</div>
 						        	<br/>
 						        	<br/>
-					        		<button class="button button-full button-stable" >Select the players:</button>
+					        		<button class="button button-full button-stable" >{{ 'MATCH_NEWMATCH_LIST_SELECT_PLAYERS' | translate }}</button>
 									<ul class="list" id="lstPlayers">
 										<li class="item item-checkbox" ng-repeat="player in playersforteam">
 											<ion-checkbox id="chkPlayer{{player.id}}" ng-model="player.checked">{{player.firstname}}&nbsp;{{player.lastname}}</ion-checkbox>
@@ -184,7 +184,7 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
         <script id="modal/selectPlayer.html" type="text/ng-template">
 			<ion-modal-view>
 				<ion-header-bar>
-					<h1 class="title">Select Scoring Player</h1>
+					<h1 class="title">{{ 'MATCH_MODAL_TITLE' | translate }}</h1>
 				</ion-header-bar>
 				<ion-content>
 					<!-- 
@@ -205,7 +205,7 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 			        	<table cellspacing="0" cellpadding="0" border="0" class="field" width="100%" height="100%">
 			        		<tr height="75">
 			        			<td width="30%" align="center"><h1><br/>{{ currentMatch.team.name.substring(0, 7) }}</h1></td>
-			        			<td width="40%" align="center"><h1>Period<br/>{{ periodCounter + 1 }} / {{ currentMatch.periods.length }}</h1></td>
+			        			<td width="40%" align="center"><h1>{{ 'MATCH_LBL_PERIOD' | translate }}<br/>{{ periodCounter + 1 }} / {{ currentMatch.periods.length }}</h1></td>
 			        			<td width="30%" align="center"><h1><br/>{{ currentMatch.opponent.substring(0, 7) }}</h1></td>
 			        		</tr>
 			        		<tr height="150">
@@ -219,10 +219,10 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 									<button ng-click="addToTeam(1)" id="btnAddToTeam2" style="display:none">+1</button>
 								</td>
 			        			<td width="40%" align="center">
-						        	<button class="button button-stable" ng-click="startPeriod()" id="btnStartPeriod">Start</button>
-						        	<button class="button button-stable" ng-click="updateDisplay()" id="btnUpdateDisplay" style="display:none">Update</button>
-						        	<button class="button button-stable" ng-click="saveData()" id="btnSaveData" style="display:none">Save</button>
-						        	<button class="button button-stable" ng-click="goHome()" id="btnHome">Home</button>
+						        	<button class="button button-stable" ng-click="startPeriod()" id="btnStartPeriod">{{ 'MATCH_BTN_START' | translate }}</button>
+						        	<button class="button button-stable" ng-click="updateDisplay()" id="btnUpdateDisplay" style="display:none">{{ 'MATCH_BTN_UPDATE' | translate }}</button>
+						        	<button class="button button-stable" ng-click="saveData()" id="btnSaveData" style="display:none">{{ 'MATCH_BTN_SAVE' | translate }}</button>
+						        	<button class="button button-stable" ng-click="goHome()" id="btnHome">{{ 'MATCH_BTN_HOME' | translate }}</button>
 			        			</td>
 			        			<td width="30%" align="center">
 									<button ng-click="addToOpponent(-1)" id="btnAddToOpponent1" style="display:none">-1</button>
@@ -240,7 +240,7 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 			<ion-view title="Match Details">
 		    	<div class="bar bar-header bar-balanced" id="barHeader">
 					<button class="button icon-left ion-chevron-left button-clear" onclick="window.location = '#/'"></button>
-					<h1 class="title">Match Detail</h1>
+					<h1 class="title">{{ 'MATCH_DETAIL_TITLE' | translate }}</h1>
 				</div>
 				<ion-content ng-controller="MatchDetailController">
 			        	<br/>
@@ -284,7 +284,7 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 						    	</div>
 						    </li>
 						    <li class="item">
-						    	Lineup:
+						    	{{ 'MATCH_DETAIL_LBL_LINEUP' | translate }}
 						    	<div class="list list-inset">
 						    		<div class="item" ng-repeat="matchplayer in currentMatch.matchplayers">
 						    			{{matchplayer.firstname}}&nbsp;{{matchplayer.lastname}}
@@ -292,6 +292,11 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 						    	</div>
 						    </li>
 						</ul>
+			        	<br/>
+			        	<br/>
+			        	<br/>
+			        	<br/>
+			        	<br/>
 				</ion-content>
 			</ion-view>
 		</script>
@@ -426,7 +431,7 @@ PPPPPPPPPP          llllllll  aaaaaaaaaa  aaaa    y:::::y            eeeeeeeeeee
 			<ion-view title="Players">
 		    	<div class="bar bar-header bar-balanced" id="barHeader">
 					<button class="button icon-left ion-chevron-left button-clear" onclick="window.location = '#/'"></button>
-					<h1 class="title">Players</h1>
+					<h1 class="title">{{ 'PLAYERS_TITLE' | translate }}</h1>
 					<button class="button button-icon button-clear ion-plus" onclick="window.location = '#/manageplayer'" id="idNewPlayer"></button>
 				</div>
 				<ion-content ng-controller="PlayersController">
@@ -441,8 +446,8 @@ PPPPPPPPPP          llllllll  aaaaaaaaaa  aaaa    y:::::y            eeeeeeeeeee
 		        	<br/>
 					<ion-list can-swipe="true">
 						<ion-item ng-repeat="player in players" ng-click="details(player)">{{player.firstname}}&nbsp;{{player.lastname}}
-							<ion-option-button class="button-assertive" ng-click="delete(player)">Del</ion-option-button>
-							<ion-option-button class="button-positive" ng-click="edit(player)">Edit</ion-option-button>
+							<ion-option-button class="button-assertive" ng-click="delete(player)">{{ 'PLAYERS_SLIDEACTION_DEL' | translate }}</ion-option-button>
+							<ion-option-button class="button-positive" ng-click="edit(player)">{{ 'PLAYERS_SLIDEACTION_EDIT' | translate }}</ion-option-button>
 						</ion-item>
 					</ion-list>
 				</ion-content>
@@ -453,7 +458,7 @@ PPPPPPPPPP          llllllll  aaaaaaaaaa  aaaa    y:::::y            eeeeeeeeeee
 			<ion-view title="Manage Player">
 		    	<div class="bar bar-header bar-balanced" id="barHeader">
 					<button class="button icon-left ion-chevron-left button-clear" onclick="window.location = '#/players'"></button>
-					<h1 class="title">Manage Player</h1>
+					<h1 class="title">{{ 'PLAYERS_MANAGE_TITLE' | translate }}</h1>
 				</div>
 				<ion-content ng-controller="PlayerController">
 		        	<br/>
@@ -461,15 +466,15 @@ PPPPPPPPPP          llllllll  aaaaaaaaaa  aaaa    y:::::y            eeeeeeeeeee
 		        	<br/>
 		        	<br/>
 	        		<label class="item item-input">
-	        			<input type="text" placeholder="Player Firstname" ng-model="firstName"/>
+	        			<input type="text" placeholder="{{ 'PLAYERS_MANAGE_PLACEHOLDER_FIRSTNAME' | translate }}" ng-model="firstName"/>
 	        		</label>
 	        		<label class="item item-input">
-	        			<input type="text" placeholder="Player lastname" ng-model="lastName"/>
+	        			<input type="text" placeholder="{{ 'PLAYERS_MANAGE_PLACEHOLDER_LASTNAME' | translate }}" ng-model="lastName"/>
 	        		</label>
 		        	<br/>
 		        	<br/>
-			        <button class="button button-full button-balanced" ng-click="addPlayer()" id="btnAddPlayer" >Add Player</button>
-			        <button class="button button-full button-balanced" ng-click="updatePlayer()" id="btnUpdatePlayer" style="display:none">Update Player</button>
+			        <button class="button button-full button-balanced" ng-click="addPlayer()" id="btnAddPlayer" >{{ 'PLAYERS_MANAGE_BTN_ADD' | translate }}</button>
+			        <button class="button button-full button-balanced" ng-click="updatePlayer()" id="btnUpdatePlayer" style="display:none">{{ 'PLAYERS_MANAGE_BTN_UPDATE' | translate }}</button>
 				</ion-content>
 			</ion-view>
 		</script>
@@ -478,7 +483,7 @@ PPPPPPPPPP          llllllll  aaaaaaaaaa  aaaa    y:::::y            eeeeeeeeeee
 			<ion-view title="Player">
 		    	<div class="bar bar-header bar-balanced" id="barHeader">
 					<button class="button icon-left ion-chevron-left button-clear" onclick="window.location = '#/players'"></button>
-					<h1 class="title">Player</h1>
+					<h1 class="title">{{ 'PLAYERS_PLAYER_TITLE' | translate }}</h1>
 				</div>
 				<ion-content ng-controller="PlayerController">
 		        	<br/>
@@ -486,10 +491,10 @@ PPPPPPPPPP          llllllll  aaaaaaaaaa  aaaa    y:::::y            eeeeeeeeeee
 		        	<br/>
 		        	<br/>
 	        		<h1>{{player.firstname}}&nbsp;{{player.lastname}}</h1>
-				    <button class="button button-full button-stable" >Matches: {{ player.nrOfMatches }}</button>
-				    <button class="button button-full button-stable" >Goals: {{ player.nrOfGoals }}</button>
+				    <button class="button button-full button-stable" >{{ 'PLAYERS_PLAYER_LBL_MATCHES' | translate }}{{ player.nrOfMatches }}</button>
+				    <button class="button button-full button-stable" >{{ 'PLAYERS_PLAYER_LBL_GOALS' | translate }}{{ player.nrOfGoals }}</button>
 		        	<br/>
-				    <button class="button button-full button-stable">Teams:</button>
+				    <button class="button button-full button-stable">{{ 'PLAYERS_PLAYER_LBL_TEAMS' | translate }}</button>
 					<ion-list>
 						<ion-item ng-repeat="team in teams" ng-click="goToTeam(team)">{{team.name}}</ion-item>
 					</ion-list>
