@@ -894,6 +894,7 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 	
 	$scope.updateDisplay = function() {
 		console.log("updateDisplay called.");
+			alert("updateDisplay called .ON");
 		
 		var currentTime = new Date();
 		
