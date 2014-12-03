@@ -155,7 +155,7 @@ TTTTTT  T:::::T  TTTTTTeeeeeeeeeeee    aaaaaaaaaaaaa      mmmmmmm    mmmmmmm   S
 							"	 WHERE" +
 							"		Team.Id = " + team.id +
 							"		AND Goal.IsForMyTeam = 1" +
-							"		AND GoalScorer.Type = " + variables.UNDEFINED_TYPE
+							"		AND GoalScorer.Type = " + variables.UNDEFINED_TYPE +
 							"	 GROUP BY" +
 							"		GoalScorer.Id" +
 							")", 
