@@ -100,7 +100,7 @@ R::::::R     R:::::R u:::::::::::::::un::::n    n::::n
 R::::::R     R:::::R  uu::::::::uu:::un::::n    n::::n
 RRRRRRRR     RRRRRRR    uuuuuuuu  uuuunnnnnn    nnnnnn*/
 
-.run(function($rootScope, $ionicPlatform, $document, currentMatchService){
+.run(function($rootScope, $ionicPlatform, $document){
 	$rootScope.generateUUID = function() {
     	var d = new Date().getTime();
     	var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -194,8 +194,7 @@ HHHHHHHHH     HHHHHHHHH   ooooooooooo   mmmmmm   mmmmmm   mmmmmm    eeeeeeeeeeee
 	};
 
 	function successOpponent()  {
-		    	console.log("HomeController.successOpponentId called: " + angular.toJson(variables.opponent));
-		    	console.log("HomeController.successOpponentId called end: " + angular.toJson(currentMatchService.opponentPlayer));
+    	console.log("HomeController.successOpponentId called end: " + angular.toJson(currentMatchService.opponentPlayer));
 	};
 
 	function successGetIds()  {
@@ -832,33 +831,35 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 
 	$scope.doTwitterEndMatch = function() {
 		if( variables.twitterSetting.value ) {
-			//eg #teamname Firstname lastname 12' / 1 - 0
-			//	! thuismatch of niet
-			var msg = '#' + currentMatchService.currentMatch.team.name.split(' ').join('_') + ' ';
-			if( currentMatchService.currentMatch.home ) {
-				msg = msg + currentMatchService.currentMatch.team.name + ' - ' + currentMatchService.currentMatch.opponent;
-			} else {			
-				msg = msg + currentMatchService.currentMatch.opponent + ' - ' + currentMatchService.currentMatch.team.name;
-			}
-			msg = msg + ' Match ended with score: ';
-			if( currentMatchService.currentMatch.home ) {
-				msg = msg + $scope.lastGoal.scoreMyTeam + ' - ' + $scope.lastGoal.scoreOpponent;
-			} else {			
-				msg = msg + $scope.lastGoal.scoreOpponent + ' - ' + $scope.lastGoal.scoreMyTeam;
-			}
-			console.log('twitter msg: ' + msg);
-			window.plugins.socialsharing.shareViaTwitter(msg, 
-				null, //subject
-				null, //file
-				null, //link 
-				function(){console.log('share ok')}, 
-				function(msg) {
-					$ionicPopup.alert({
-						title: 'Twitter end match',
-						template: 'error: ' + msg
-					});
+			$translate(['TWITTER_MSG_END_MATCH']).then(function (translations) {
+				//eg #teamname Firstname lastname 12' / 1 - 0
+				//	! thuismatch of niet
+				var msg = '#' + currentMatchService.currentMatch.team.name.split(' ').join('_') + ' ';
+				if( currentMatchService.currentMatch.home ) {
+					msg = msg + currentMatchService.currentMatch.team.name + ' - ' + currentMatchService.currentMatch.opponent;
+				} else {			
+					msg = msg + currentMatchService.currentMatch.opponent + ' - ' + currentMatchService.currentMatch.team.name;
 				}
-			);
+				msg = msg + $translate.TWITTER_MSG_END_MATCH;
+				if( currentMatchService.currentMatch.home ) {
+					msg = msg + $scope.lastGoal.scoreMyTeam + ' - ' + $scope.lastGoal.scoreOpponent;
+				} else {			
+					msg = msg + $scope.lastGoal.scoreOpponent + ' - ' + $scope.lastGoal.scoreMyTeam;
+				}
+				console.log('twitter msg: ' + msg);
+				window.plugins.socialsharing.shareViaTwitter(msg, 
+					null, //subject
+					null, //file
+					null, //link 
+					function(){console.log('share ok')}, 
+					function(msg) {
+						$ionicPopup.alert({
+							title: 'Twitter end match',
+							template: 'error: ' + msg
+						});
+					}
+				);
+			});
 		}
 	};
 	
@@ -1059,7 +1060,7 @@ S:::::::::::::::SS   ee:::::::::::::e          tt:::::::::::tt    tt:::::::::::t
                                                                                                               ggg::::::ggg                                                                                                                                                                                                
                                                                                                                  gggggg                                                                                                                                                                                                   
 */
-.controller('SettingsController', function($scope, $translate, $ionicPopup, SettingsService) {
+.controller('SettingsController', function($scope, $translate, $ionicPopup, SettingsService, translationService) {
 	$scope.twitter = variables.twitterSetting;
 	$scope.preferredLang = variables.preferredLangSetting;
 
@@ -1071,7 +1072,7 @@ S:::::::::::::::SS   ee:::::::::::::e          tt:::::::::::tt    tt:::::::::::t
 
 	$scope.changeLang = function(setting) {
 		$scope.change(setting, variables.LANGUAGE_PREF);
-		$translate.use(setting.value);
+		translationService.setPreferredLanguage(setting.value);
 	}
 
 	$scope.change = function(setting, name) {

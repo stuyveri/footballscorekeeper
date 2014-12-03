@@ -88,7 +88,12 @@ angular.module('SoccerKeeperApp.translationService', ['pascalprecht.translate'])
       MATCH_EXIT_POPUP_TEMPLATE: 'Are you sure you want to leave without saving the match?',
       //MATCH - SAVE
       MATCH_SAVE_POPUP_TITLE: 'Save',
-      MATCH_SAVE_POPUP_TEMPLATE: 'Save Done!'
+      MATCH_SAVE_POPUP_TEMPLATE: 'Save Done!',
+      //TWITTER
+      TWITTER_MSG_END_MATCH: ' Match ended with score: ',
+      //MY OPPONENT
+      OPPONENT_FIRSTNAME: 'my',
+      OPPONENT_LASTNAME: 'opponent'
   	});
   	$translateProvider.translations('nl', {
       HOME_TITLE: 'Score Keeper',
@@ -175,21 +180,35 @@ angular.module('SoccerKeeperApp.translationService', ['pascalprecht.translate'])
       MATCH_PERIODPASSED_POPUP_TEMPLATE: 'Periode voorbij, kies Start om de volgende te beginnen',
       //MATCH - EXIT
       MATCH_EXIT_POPUP_TITLE: 'Wil je niet saven?',
-      MATCH_EXIT_POPUP_TEMPLATE: 'Ben je zeker dat je wil gaan zonder te saven?',
+      MATCH_EXIT_POPUP_TEMPLATE: 'Ben je zeker dat je wil gaan zonder te bewaren?',
       //MATCH - SAVE
       MATCH_SAVE_POPUP_TITLE: 'Bewaren',
-      MATCH_SAVE_POPUP_TEMPLATE: 'Bewaren gelukt!'
+      MATCH_SAVE_POPUP_TEMPLATE: 'Bewaren gelukt!',
+      //TWITTER
+      TWITTER_MSG_END_MATCH: ' Match ten einde. Score: ',
+      //MY OPPONENT
+      OPPONENT_FIRSTNAME: 'mijn',
+      OPPONENT_LASTNAME: 'tegenstander'
   	});
   	$translateProvider.preferredLanguage('en');
     $translateProvider.fallbackLanguage('en');
 })
 
 
-.service('translationService', ['$translate', function($translate) {
+.service('translationService', ['$translate', 'currentMatchService', function($translate, currentMatchService) {
 
    return {
       setPreferredLanguage: function(lang) {
+        console.log("changing lang: " + lang)
         $translate.use(lang);
+
+
+        //Translate my opponent
+        $translate(['OPPONENT_FIRSTNAME', 'OPPONENT_LASTNAME']).then(function (translations) {
+          console.log("my opponent translated: " + translations.OPPONENT_FIRSTNAME)
+          currentMatchService.opponentPlayer.firstname = translations.OPPONENT_FIRSTNAME;
+          currentMatchService.opponentPlayer.lastname = translations.OPPONENT_LASTNAME;
+        });
       }
    };
 }]);

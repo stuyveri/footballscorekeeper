@@ -155,6 +155,7 @@ TTTTTT  T:::::T  TTTTTTeeeeeeeeeeee    aaaaaaaaaaaaa      mmmmmmm    mmmmmmm   S
 							"	 WHERE" +
 							"		Team.Id = " + team.id +
 							"		AND Goal.IsForMyTeam = 1" +
+							"		AND GoalScorer.Type = " + variables.UNDEFINED_TYPE
 							"	 GROUP BY" +
 							"		GoalScorer.Id" +
 							")", 
@@ -514,29 +515,6 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 				fnSuccess
 			);
 	    },
-/*
-	    getUndefinedPlayer: function(fnSuccess, fnError) {
-
-	    	if( _undefinedPlayer == null ) {
-
-				variables.db.transaction(function(tx) {
-
-						tx.executeSql('SELECT Id, FirstName, LastName FROM Player WHERE Type = 2 ORDER BY LastName asc', [], 
-							function (tx, results) {
-								_undefinedPlayer = new Player(results.rows.item(0).Id, results.rows.item(0).FirstName, results.rows.item(0).LastName);
-								console.log("_undefinedPlayer: " + angular.toJson(_undefinedPlayer));
-							}, 
-							fnError
-						); 
-					}, 
-					fnError, 
-					fnSuccess
-				);
-			} else {
-				return _undefinedPlayer;
-			}
-	    },
-*/
 	    insertMatch: function(match, fnSuccess, fnError) {
 
 			variables.db.transaction(function(tx) {
@@ -603,6 +581,7 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 								"	, Goal.ScoreOpponent" +
 								"	, Goal.IsForMyTeam" +
 								"	, GoalScorer.Id AS GoalScorerPlayerId" +
+								"	, GoalScorer.Type AS GoalScorerPlayerType" +
 								"	, GoalScorer.FirstName AS GoalScorerFirstName" +
 								"	, GoalScorer.LastName AS GoalScorerLastName" +
 								" FROM Match" +
@@ -742,7 +721,12 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 			//Goal
 			console.log("tempPeriod.goals: " + tempGoal.id + " / record goal id: " + results.rows.item(i).GoalId);
 			if ( tempGoal.id != results.rows.item(i).GoalId ) {
-				tempGoalScorer = new Player(results.rows.item(i).GoalScorerPlayerId, results.rows.item(i).GoalScorerFirstName, results.rows.item(i).GoalScorerLastName);
+				//check if opponent => use opponent from currentMatchService
+				if( results.rows.item(i).GoalScorerPlayerType == variables.OPPONENT_TYPE ) {
+					tempGoalScorer = currentMatchService.opponentPlayer;
+				} else {
+					tempGoalScorer = new Player(results.rows.item(i).GoalScorerPlayerId, results.rows.item(i).GoalScorerFirstName, results.rows.item(i).GoalScorerLastName);					
+				}
 				tempGoal = new Goal(results.rows.item(i).GoalId, results.rows.item(i).Minute, results.rows.item(i).ScoreMyTeam, results.rows.item(i).ScoreOpponent, SqlToBoolean(results.rows.item(i).IsForMyTeam), tempGoalScorer, tempPeriod);
 				tempPeriod.goals.push( tempGoal );
 			}

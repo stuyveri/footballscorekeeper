@@ -3,6 +3,8 @@ var variables = {
 	databaseVersion : "1.2",
 	TWITTER : "TWITTER",
 	LANGUAGE_PREF : "LANGUAGE_PREF",
+	OPPONENT_TYPE : 1,
+	UNDEFINED_TYPE : 2,
 	//1.1: 
 	//		Id added
 	//		myTeamPlayers

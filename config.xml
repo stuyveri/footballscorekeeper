@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <widget xmlns   = "http://www.w3.org/ns/widgets"
         xmlns:gap   = "http://phonegap.com/ns/1.0"
+        xmlns:android = "http://schemas.android.com/apk/res/android"
         id          = "be.gorisoft.football.scorekeeper"
         versionCode = "15" 
         version     = "1.1.0" >
@@ -16,10 +17,29 @@
     <gap:platform name="ios" />
     <gap:platform name="android" />
 
-	<gap:splash src="splash.png" gap:platform="ios"/>
 	<icon src="logo.png" gap:platform="ios" width="60" height="60" />
 
     <gap:plugin name="nl.x-services.plugins.socialsharing" />
     <gap:plugin name="net.yoik.cordova.plugins.screenorientation" version="1.2.1" />
 
+    <!-- ANDROID -->
+    <gap:config-file platform="android" parent="/manifest/application">
+        <activity android:launchMode="singleTop" />
+    </gap:config-file>
+    <gap:splash src="Default.png" gap:platform="android"/>
+
+
+    <!-- iOS -->
+    <!-- Only go for phones, otherwise too many testing and too many types of splash screens required -->
+    <preference name="target-device" value="handset" />
+    <!-- iPhone and iPod touch -->
+    <gap:splash src="Default.png" gap:platform="ios" width="320" height="480" />
+    <gap:splash src="Default@2x.png" gap:platform="ios" width="640" height="960" />
+
+    <!-- iPhone 5 / iPod Touch (5th Generation) -->
+    <gap:splash src="Default-568h@2x.png" gap:platform="ios" width="640" height="1136" />
+
+    <!-- iPhone 6 -->
+    <gap:splash src="Default-667h@2x.png" gap:platform="ios" width="750" height="1334" />
+    <gap:splash src="Default-Portrait-736h@3x.png" gap:platform="ios" width="1242" height="2208" />
 </widget>
