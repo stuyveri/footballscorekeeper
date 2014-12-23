@@ -397,10 +397,14 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 .factory('MatchService', function(currentMatchService) {
   	var _matches = [];
   	var _teams = [];
+  	var _replacements = [];
+  	var _cards = [];
 
 	return {
 		matches : _matches,
 		teams : _teams,
+		replacements : _replacements,
+		cards : _cards,
 	    getAllMatches: function(fnSuccess, fnError) {
 
 			variables.db.transaction(function(tx) {
@@ -523,8 +527,8 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 					tx.executeSql('INSERT INTO Match(Id, Opponent, MatchDate, IsHomeMatch, TeamScore, OpponentScore, Team) VALUES (' + match.id + ', "' + match.opponent + '", ' + match.date.getTime() + ', ' + booleanToSql(match.home) + ', ' + match.teamScore + ', ' + match.opponentScore + ', ' + match.team.id + ')'); 
 					//loop over all arrays of match
 					$.each(match.matchplayers, function(index, matchplayer) {
-						console.log("INSERT MATCHPLAYER: " + 'INSERT INTO MatchPlayer(Id, Match, Player) VALUES (' + matchplayer.id + ', ' + matchplayer.match.id + ', ' + matchplayer.player.id + ')');
-						tx.executeSql('INSERT INTO MatchPlayer(Id, Match, Player) VALUES (' + matchplayer.id + ', ' + matchplayer.match.id + ', ' + matchplayer.player.id + ')'); 
+						console.log("INSERT MATCHPLAYER: " + 'INSERT INTO MatchPlayer(Id, Match, Player, IsBasePlayer) VALUES (' + matchplayer.id + ', ' + matchplayer.match.id + ', ' + matchplayer.player.id + ', ' + booleanToSql(matchplayer.isBasePlayer) + ')');
+						tx.executeSql('INSERT INTO MatchPlayer(Id, Match, Player, IsBasePlayer) VALUES (' + matchplayer.id + ', ' + matchplayer.match.id + ', ' + matchplayer.player.id + ', ' + booleanToSql(matchplayer.isBasePlayer) + ')'); 
 					});
 					$.each(match.periods, function(index, period) {
 						console.log("INSERT PERIOD: " + 'INSERT INTO Period(Id, Number, Length, Match) VALUES (' + period.id + ', ' + period.number + ', ' + period.length + ', ' + period.match.id + ')');
@@ -536,6 +540,14 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 							console.log("INSERT GOAL: " + 'INSERT INTO Goal(Id, Minute, ScoreMyTeam, ScoreOpponent, IsForMyTeam, Period, Player) VALUES (' + goal.id + ', ' + goal.minute + ', ' + goal.scoreMyTeam + ', ' + goal.scoreOpponent + ', ' + booleanToSql(goal.isForMyTeam) + ', ' + period.id + ', ' + goal.player.id + ')');
 							tx.executeSql('INSERT INTO Goal(Id, Minute, ScoreMyTeam, ScoreOpponent, IsForMyTeam, Period, Player) VALUES (' + goal.id + ', ' + goal.minute + ', ' + goal.scoreMyTeam + ', ' + goal.scoreOpponent + ', ' + booleanToSql(goal.isForMyTeam) + ', ' + period.id + ', ' + goal.player.id + ')'); 
 						});
+					});
+					$.each(match.replacements, function(index, replacement) {
+						console.log("INSERT REPLACEMENT: " + 'INSERT INTO Replacement(Id, Match, MatchPlayerIn, MatchPlayerOut, Minute) VALUES (NULL, ' + match.id + ', ' + replacement.playerIn.id + ', ' + replacement.playerOut.id + ', ' + replacement.minute + ')');
+						tx.executeSql('INSERT INTO Replacement(Id, Match, MatchPlayerIn, MatchPlayerOut, Minute) VALUES (NULL, ' + match.id + ', ' + replacement.playerIn.id + ', ' + replacement.playerOut.id + ', ' + replacement.minute + ')'); 
+					});
+					$.each(match.cards, function(index, card) {
+						console.log("INSERT CARD: " + 'INSERT INTO Card(Id, MatchPlayer, CardType, Match, Minute) VALUES (NULL, ' + card.matchPlayer.id + ', ' + card.cardType.id + ', ' + match.id + ', ' + card.minute + ')');
+						tx.executeSql('INSERT INTO Card(Id, MatchPlayer, CardType, Match, Minute) VALUES (NULL, ' + card.matchPlayer.id + ', ' + card.cardType.id + ', ' + match.id + ', ' + card.minute + ')'); 
 					});
 				}, 
 				fnError, 
@@ -556,7 +568,7 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 
 			variables.db.transaction(function(tx) {
 
-					//TODO: big query over all tables
+					//big query over all tables
 					//		OUTER JOIN nr Match/MatchPlayer
 					//	Should split into teams array that can be used in Home page
 					tx.executeSql(
@@ -569,7 +581,7 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 								"	, Match.OpponentScore" +
 								"	, Team.Id AS TeamId" +
 								"	, Team.Name AS TeamName" +
-								"	, LineUp.Id AS MatchPlayerId" +
+								"	, LineUp.Id AS PlayerId" +
 								"	, LineUp.FirstName AS MatchPlayerFirstName" +
 								"	, LineUp.LastName AS MatchPlayerLastName" +
 								"	, Period.Id As PeriodId" +
@@ -584,6 +596,8 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 								"	, GoalScorer.Type AS GoalScorerPlayerType" +
 								"	, GoalScorer.FirstName AS GoalScorerFirstName" +
 								"	, GoalScorer.LastName AS GoalScorerLastName" +
+								"	, MatchPlayer.Id AS MatchPlayerId" +
+								"	, MatchPlayer.IsBasePlayer" +
 								" FROM Match" +
 								"	INNER JOIN Team ON Team.Id = Match.Team" +
 								"	INNER JOIN MatchPlayer ON Match.Id = MatchPlayer.Match" +
@@ -597,6 +611,64 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 								"	Period.Number" +
 								"	, GoalId" 
 								, [], doMatch, fnError); 
+				}, 
+				fnError, 
+				fnSuccess
+			);
+	    },
+	    getReplacementsByMatchId: function(match, fnSuccess, fnError) {
+
+			variables.db.transaction(function(tx) {
+					tx.executeSql(
+								" SELECT" +
+								"	Replacement.Id AS RepId" +
+								"	, Replacement.Minute" +
+								"	, RepMatchPlayerIn.Id AS RepMatchPlayerInId" +
+								"	, RepMatchPlayerIn.IsBasePlayer AS RepMatchPlayerInIsBasePlayer" +
+								"	, RepPlayerIn.Id AS RepPlayerInId" +
+								"	, RepPlayerIn.FirstName AS RepPlayerInFirstName" +
+								"	, RepPlayerIn.LastName AS RepPlayerInLastName" +
+								"	, RepMatchPlayerOut.Id AS RepMatchPlayerOutId" +
+								"	, RepMatchPlayerOut.IsBasePlayer AS RepMatchPlayerOutIsBasePlayer" +
+								"	, RepPlayerOut.Id AS RepPlayerOutId" +
+								"	, RepPlayerOut.FirstName AS RepPlayerOutFirstName" +
+								"	, RepPlayerOut.LastName AS RepPlayerOutLastName" +
+								" FROM Replacement" +
+								"	INNER JOIN MatchPlayer AS RepMatchPlayerIn ON Replacement.MatchPlayerIn = RepMatchPlayerIn.Id" +
+								"	INNER JOIN Player AS RepPlayerIn ON RepPlayerIn.Id = RepMatchPlayerIn.Player" +
+								"	INNER JOIN MatchPlayer AS RepMatchPlayerOut ON Replacement.MatchPlayerOut = RepMatchPlayerOut.Id" +
+								"	INNER JOIN Player AS RepPlayerOut ON RepPlayerOut.Id = RepMatchPlayerOut.Player" +
+								" WHERE" +
+								"	Replacement.Match = " + match.id 
+								, [], doReplacements, fnError); 
+				}, 
+				fnError, 
+				fnSuccess
+			);
+	    },
+	    getCardsByMatchId: function(match, fnSuccess, fnError) {
+
+			variables.db.transaction(function(tx) {
+					tx.executeSql(
+								" SELECT" +
+								"	Card.Id AS CardId" +
+								"	, Card.Minute" +
+								"	, CardType.Id AS CardTypeId" +
+								"	, CardType.Name" +
+								"	, CardType.Description" +
+								"	, CardType.ImageLink" +
+								"	, MatchPlayer.Id AS MatchPlayerId" +
+								"	, MatchPlayer.IsBasePlayer" +
+								"	, Player.Id AS PlayerId" +
+								"	, Player.FirstName" +
+								"	, Player.LastName" +
+								" FROM Card" +
+								"	INNER JOIN CardType ON Card.CardType = CardType.Id" +
+								"	INNER JOIN MatchPlayer ON Card.MatchPlayer = MatchPlayer.Id" +
+								"	INNER JOIN Player ON Player.Id = MatchPlayer.Player" +
+								" WHERE" +
+								"	Card.Match = " + match.id
+								, [], doCards, fnError); 
 				}, 
 				fnError, 
 				fnSuccess
@@ -682,8 +754,9 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 		tempMatch.teamScore = results.rows.item(0).TeamScore;
 		tempMatch.opponentScore = results.rows.item(0).OpponentScore;
 
-		var tempLineUpper = new Player(results.rows.item(0).MatchPlayerId, results.rows.item(0).MatchPlayerFirstName, results.rows.item(0).MatchPlayerLastName);
-		tempMatch.matchplayers.push( tempLineUpper );
+		var tempLineUpper = new Player(results.rows.item(0).PlayerId, results.rows.item(0).MatchPlayerFirstName, results.rows.item(0).MatchPlayerLastName);
+		var tempMatchPlayer = new MatchPlayer(results.rows.item(0).MatchPlayerId, null, tempLineUpper, SqlToBoolean(results.rows.item(0).IsBasePlayer));
+		tempMatch.matchplayers.push( tempMatchPlayer );
 
 		var tempPeriod = new Period(results.rows.item(0).PeriodId, tempMatch, results.rows.item(0).Number, results.rows.item(0).Length);
 		tempMatch.periods.push( tempPeriod );
@@ -707,8 +780,9 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 				}
 			});
 			if( !found ) {
-				tempLineUpper = new Player(results.rows.item(i).MatchPlayerId, results.rows.item(i).MatchPlayerFirstName, results.rows.item(i).MatchPlayerLastName);
-				tempMatch.matchplayers.push( tempLineUpper );
+				tempLineUpper = new Player(results.rows.item(i).PlayerId, results.rows.item(i).MatchPlayerFirstName, results.rows.item(i).MatchPlayerLastName);
+				tempMatchPlayer = new MatchPlayer(results.rows.item(i).MatchPlayerId, null, tempLineUpper, SqlToBoolean(results.rows.item(i).IsBasePlayer));
+				tempMatch.matchplayers.push( tempMatchPlayer );
 			}
 
 			//periods
@@ -720,7 +794,7 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 
 			//Goal
 			console.log("tempPeriod.goals: " + tempGoal.id + " / record goal id: " + results.rows.item(i).GoalId);
-			if ( tempGoal.id != results.rows.item(i).GoalId ) {
+			if ( tempGoal.id != results.rows.item(i).GoalId && results.rows.item(i).GoalId != null ) {
 				//check if opponent => use opponent from currentMatchService
 				if( results.rows.item(i).GoalScorerPlayerType == variables.OPPONENT_TYPE ) {
 					tempGoalScorer = currentMatchService.opponentPlayer;
@@ -737,6 +811,34 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 		currentMatchService.currentMatch = tempMatch;
 	}
 
+	function doReplacements(tx, results) {
+		//Empty array but not re-init it!! otherwise it does not work
+	    _replacements.length = 0;
+		for (var i=0; i<results.rows.length; i++){
+			var tempPlayerIn = new Player(results.rows.item(i).RepPlayerInId, results.rows.item(i).RepPlayerInFirstName, results.rows.item(i).RepPlayerInLastName);
+			var tempMatchPlayerIn = new MatchPlayer(results.rows.item(i).RepMatchPlayerInId, null, tempPlayerIn, SqlToBoolean(results.rows.item(i).RepMatchPlayerInIsBasePlayer));
+			var tempPlayerOut = new Player(results.rows.item(i).RepPlayerOutId, results.rows.item(i).RepPlayerOutFirstName, results.rows.item(i).RepPlayerOutLastName);
+			var tempMatchPlayerOut = new MatchPlayer(results.rows.item(i).RepMatchPlayerOutId, null, tempPlayerOut, SqlToBoolean(results.rows.item(i).RepMatchPlayerOutIsBasePlayer));
+
+			var replacement = new Replacement(results.rows.item(i).RepId, tempMatchPlayerIn, tempMatchPlayerOut, results.rows.item(i).Minute);
+
+			_replacements.push( replacement );
+		}
+	}
+
+	function doCards(tx, results) {
+		//Empty array but not re-init it!! otherwise it does not work
+	    _cards.length = 0;
+		for (var i=0; i<results.rows.length; i++){
+			var cardType = new CardType(results.rows.item(i).CardTypeId, results.rows.item(i).Name, results.rows.item(i).Description, results.rows.item(i).ImageLink);
+			var tempPlayer = new Player(results.rows.item(i).PlayerId, results.rows.item(i).FirstName, results.rows.item(i).LastName);
+			var tempMatchPlayer = new MatchPlayer(results.rows.item(i).MatchPlayerId, null, tempPlayer, SqlToBoolean(results.rows.item(i).IsBasePlayer));
+
+			var card = new Card(results.rows.item(i).CardId, tempMatchPlayer, cardType, results.rows.item(i).Minute);
+
+			_cards.push( card );
+		}
+	}
 })
 
 /* 
@@ -809,5 +911,54 @@ S:::::::::::::::SS   ee:::::::::::::e          tt:::::::::::tt    tt:::::::::::t
 		}
 
 		console.log("doSettings: " + angular.toJson(_settings) );
+	}
+})
+
+/* 
+                                                                      dddddddd                                                                                                                                                  
+        CCCCCCCCCCCCC                                                 d::::::d                    SSSSSSSSSSSSSSS                                                                 iiii                                          
+     CCC::::::::::::C                                                 d::::::d                  SS:::::::::::::::S                                                               i::::i                                         
+   CC:::::::::::::::C                                                 d::::::d                 S:::::SSSSSS::::::S                                                                iiii                                          
+  C:::::CCCCCCCC::::C                                                 d:::::d                  S:::::S     SSSSSSS                                                                                                              
+ C:::::C       CCCCCC  aaaaaaaaaaaaa  rrrrr   rrrrrrrrr       ddddddddd:::::d     ssssssssss   S:::::S                eeeeeeeeeeee    rrrrr   rrrrrrrrrvvvvvvv           vvvvvvviiiiiii     cccccccccccccccc    eeeeeeeeeeee    
+C:::::C                a::::::::::::a r::::rrr:::::::::r    dd::::::::::::::d   ss::::::::::s  S:::::S              ee::::::::::::ee  r::::rrr:::::::::rv:::::v         v:::::v i:::::i   cc:::::::::::::::c  ee::::::::::::ee  
+C:::::C                aaaaaaaaa:::::ar:::::::::::::::::r  d::::::::::::::::d ss:::::::::::::s  S::::SSSS          e::::::eeeee:::::eer:::::::::::::::::rv:::::v       v:::::v   i::::i  c:::::::::::::::::c e::::::eeeee:::::ee
+C:::::C                         a::::arr::::::rrrrr::::::rd:::::::ddddd:::::d s::::::ssss:::::s  SS::::::SSSSS    e::::::e     e:::::err::::::rrrrr::::::rv:::::v     v:::::v    i::::i c:::::::cccccc:::::ce::::::e     e:::::e
+C:::::C                  aaaaaaa:::::a r:::::r     r:::::rd::::::d    d:::::d  s:::::s  ssssss     SSS::::::::SS  e:::::::eeeee::::::e r:::::r     r:::::r v:::::v   v:::::v     i::::i c::::::c     ccccccce:::::::eeeee::::::e
+C:::::C                aa::::::::::::a r:::::r     rrrrrrrd:::::d     d:::::d    s::::::s             SSSSSS::::S e:::::::::::::::::e  r:::::r     rrrrrrr  v:::::v v:::::v      i::::i c:::::c             e:::::::::::::::::e 
+C:::::C               a::::aaaa::::::a r:::::r            d:::::d     d:::::d       s::::::s               S:::::Se::::::eeeeeeeeeee   r:::::r               v:::::v:::::v       i::::i c:::::c             e::::::eeeeeeeeeee  
+ C:::::C       CCCCCCa::::a    a:::::a r:::::r            d:::::d     d:::::d ssssss   s:::::s             S:::::Se:::::::e            r:::::r                v:::::::::v        i::::i c::::::c     ccccccce:::::::e           
+  C:::::CCCCCCCC::::Ca::::a    a:::::a r:::::r            d::::::ddddd::::::dds:::::ssss::::::sSSSSSSS     S:::::Se::::::::e           r:::::r                 v:::::::v        i::::::ic:::::::cccccc:::::ce::::::::e          
+   CC:::::::::::::::Ca:::::aaaa::::::a r:::::r             d:::::::::::::::::ds::::::::::::::s S::::::SSSSSS:::::S e::::::::eeeeeeee   r:::::r                  v:::::v         i::::::i c:::::::::::::::::c e::::::::eeeeeeee  
+     CCC::::::::::::C a::::::::::aa:::ar:::::r              d:::::::::ddd::::d s:::::::::::ss  S:::::::::::::::SS   ee:::::::::::::e   r:::::r                   v:::v          i::::::i  cc:::::::::::::::c  ee:::::::::::::e  
+        CCCCCCCCCCCCC  aaaaaaaaaa  aaaarrrrrrr               ddddddddd   ddddd  sssssssssss     SSSSSSSSSSSSSSS       eeeeeeeeeeeeee   rrrrrrr                    vvv           iiiiiiii    cccccccccccccccc    eeeeeeeeeeeeee                                                   
+*/
+.factory('CardsService', function() {
+  	var _cards = [];
+  	var _cardTypes = [];
+
+	return {
+		cards : _cards,
+		cardTypes : _cardTypes,
+	    getAllCardTypes: function(fnSuccess, fnError) {
+
+			variables.db.transaction(function(tx) {
+
+					tx.executeSql('SELECT Id, Name, Description, ImageLink FROM CardType ORDER BY Id asc', [], doCardTypes, fnError); 
+				}, 
+				fnError, 
+				fnSuccess
+			);
+	    }
+	}
+
+	function doCardTypes(tx, results) {
+		//Empty array but not re-init it!! otherwise it does not work
+	    _cardTypes.length = 0;
+		for (var i=0; i<results.rows.length; i++){
+			_cardTypes.push( new CardType(results.rows.item(i).Id, results.rows.item(i).Name, results.rows.item(i).Description, results.rows.item(i).ImageLink) );
+		}
+
+		console.log("doCardTypes: " + angular.toJson(_cardTypes) );
 	}
 });

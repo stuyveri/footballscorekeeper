@@ -10,6 +10,12 @@
     </head>
     <body>
     	<ion-nav-view animation="slide-left-right"></ion-nav-view>
+		<ion-content>
+        	<br/>
+        	<br/>
+        	<br/>
+			{{ 'NOPAGE_LOADING' | translate }}
+		</ion-content>
 		<div class="bar bar-footer bar-balanced" id="barFooter">
 			<button class="button button-icon button-clear ion-ios7-person" onclick="window.location = '#/players'"></button>
 			<div class="title">
@@ -165,6 +171,7 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 									<ul class="list" id="lstPlayers">
 										<li class="item item-checkbox" ng-repeat="player in playersforteam">
 											<ion-checkbox id="chkPlayer{{player.id}}" ng-model="player.checked">{{player.firstname}}&nbsp;{{player.lastname}}</ion-checkbox>
+											<ion-checkbox id="chkPlayer{{player.id}}_Base" ng-model="player.isOnField">{{ 'MATCH_NEWMATCH_IS_BASE_PLAYER' | translate }}</ion-checkbox>
 					        			</li>
 					        		</ul>
 					        		<br/>
@@ -192,8 +199,74 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 						- if wrong player => pop and redo
 					-->
 					<ion-list>
-						<ion-item ng-repeat="player in playersForTeam" ng-click="choosePlayer(player)">{{player.firstname}}&nbsp;{{player.lastname}}</ion-item>
+						<ion-item ng-repeat="matchplayer in playersForTeam | filter:{ player : { isOnField : true } }" ng-click="choosePlayer(matchplayer.player)">{{matchplayer.player.firstname}}&nbsp;{{matchplayer.player.lastname}}</ion-item>
 					</ion-list>
+				</ion-content>
+			</ion-modal-view>
+		</script>
+        
+        
+        <script id="modal/replacePlayers.html" type="text/ng-template">
+			<ion-modal-view>
+				<ion-header-bar>
+					<h1 class="title">{{ 'MATCH_MODAL_REPLACEMENT_TITLE' | translate }}</h1>
+				</ion-header-bar>
+				<ion-content>
+			        <table cellspacing="0" cellpadding="0" border="0" width="100%" height="100%">
+			        	<tr>
+			        		<td width="50%">{{ 'MATCH_MODAL_REPLACEMENT_ON_FIELD' | translate }}</td>
+			        		<td width="50%">{{ 'MATCH_MODAL_REPLACEMENT_OFF_FIELD' | translate }}</td>
+			        	</tr>
+			        	<tr>
+			        		<td width="50%">
+								<ion-list>
+									<ion-checkbox ng-repeat="matchplayer in playersForTeam | filter:{ player : { isOnField : true } }" ng-model="matchplayer.player.replace">{{matchplayer.player.lastname}}&nbsp;{{ matchplayer.player.firstname.substring(0, 1) }}.</ion-checkbox>
+								<ion-list>
+			        		</td>
+			        		<td width="50%">
+								<ion-list>
+									<ion-checkbox ng-repeat="matchplayer in playersForTeam | filter:{ player : { isOnField : false } }" ng-model="matchplayer.player.replace">{{matchplayer.player.lastname}}&nbsp;{{ matchplayer.player.firstname.substring(0, 1) }}.</ion-checkbox>
+								<ion-list>
+			        		</td>
+			        	</tr>
+			        </table>
+			        <button class="button button-block button-balanced" ng-click="doReplacements()" id="btnDoReplacements">{{ 'MATCH_MODAL_REPLACEMENT_BUTTON_DO_REPLACEMENT' | translate }}</button>
+				</ion-content>
+			</ion-modal-view>
+		</script>
+        
+        
+        <script id="modal/cardPlayer.html" type="text/ng-template">
+			<ion-modal-view>
+				<ion-header-bar>
+					<h1 class="title">{{ 'MATCH_MODAL_CARD_TITLE' | translate }}</h1>
+				</ion-header-bar>
+				<ion-content>
+						<!--
+					<div class="list">
+						<ion-radio ng-repeat="matchplayer in playersForTeam | filter:{ player : { isOnField : true } }" ng-model="$parent.matchPlayerWithCard" value="{{matchplayer.id}}" name="rdPlayerCard">{{matchplayer.player.lastname}}&nbsp;{{ matchplayer.player.firstname.substring(0, 1) }}.</ion-radio>
+
+						<ion-item ng-repeat="matchplayer in playersForTeam | filter:{ player : { isOnField : true } }" >
+							<input type="radio" id="rdPlayerCard{{matchplayer.id}}" name="rdPlayerCard" ng-model="$parent.matchPlayerWithCard" ng-value="matchplayer.id"/>&nbsp;&nbsp;<label for="rdPlayerCard{{matchplayer.id}}">{{matchplayer.player.lastname}}&nbsp;{{ matchplayer.player.firstname.substring(0, 1) }}.</label>
+						</ion-item>
+					</div>
+						-->
+					<ion-list>
+						<label class="item item-radio" ng-repeat="matchplayer in playersForTeam | filter:{ player : { isOnField : true } }">
+							<input type="radio" id="rdPlayerCard{{matchplayer.id}}" name="rdPlayerCard" ng-model="$parent.matchPlayerWithCard" ng-value="matchplayer.id"/>
+							<div class="item-content">{{matchplayer.player.lastname}}&nbsp;{{ matchplayer.player.firstname.substring(0, 1) }}.</div>
+							<i class="radio-icon ion-checkmark"></i>
+						</label>
+					</ion-list>
+		        	<br/>
+		        	<br/>
+				    <table cellspacing="0" cellpadding="0" border="0"width="100%" height="100%">
+				    	<tr>
+				    		<td width="33%" align="center"><img src="img/YellowCard.png" ng-click="doCard(CARD_YELLOW)"/></td>
+				    		<td width="34%" align="center"><img src="img/RedCard.png" ng-click="doCard(CARD_RED)"/></td>
+				    		<td width="33%" align="center"><img src="img/YellowRedCard.png" ng-click="doCard(CARD_YELLOW_TO_RED)"/></td>
+				    	</tr>
+				    </table>
 				</ion-content>
 			</ion-modal-view>
 		</script>
@@ -217,10 +290,23 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 			        			<td width="30%" align="center">
 									<button ng-click="addToTeam(-1)" id="btnAddToTeam1" style="display:none">-1</button>
 									<button ng-click="addToTeam(1)" id="btnAddToTeam2" style="display:none">+1</button>
+									<br/>
+									<img src="img/arrow-swap.png" width="30px" height="30px" ng-click="startReplacement()" id="btnDoReplacement" style="display:none"/>
+									<!-- 
+									<button class="button button-clear ion-arrow-swap" ng-click="startReplacement()" id="btnDoReplacement" style="display:none"></button>
+									 -->
+									&nbsp;
+									&nbsp;
+									<img src="img/YellowRedCard_big.png" width="20px" height="26px"  ng-click="startCard()" id="imgDoCard" style="display:none"/>
+									<!-- 
+									<button class="button" ng-click="startCard()" id="imgDoCard" style="display:none"><img src="img/YellowRedCard.png"/></button>
+									 -->
 								</td>
 			        			<td width="40%" align="center">
 						        	<button class="button button-stable" ng-click="startPeriod()" id="btnStartPeriod">{{ 'MATCH_BTN_START' | translate }}</button>
+									<!-- 
 						        	<button class="button button-stable" ng-click="updateDisplay()" id="btnUpdateDisplay" style="display:none">{{ 'MATCH_BTN_UPDATE' | translate }}</button>
+									 -->
 						        	<button class="button button-stable" ng-click="saveData()" id="btnSaveData" style="display:none">{{ 'MATCH_BTN_SAVE' | translate }}</button>
 						        	<button class="button button-stable" ng-click="goHome()" id="btnHome">{{ 'MATCH_BTN_HOME' | translate }}</button>
 			        			</td>
@@ -283,11 +369,58 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 						    		</div>
 						    	</div>
 						    </li>
+				    		<button class="button button-full button-stable">{{ 'MATCH_DETAIL_LBL_LINEUP' | translate }}</button>
 						    <li class="item">
-						    	{{ 'MATCH_DETAIL_LBL_LINEUP' | translate }}
 						    	<div class="list list-inset">
 						    		<div class="item" ng-repeat="matchplayer in currentMatch.matchplayers">
-						    			{{matchplayer.firstname}}&nbsp;{{matchplayer.lastname}}
+			        					<table cellspacing="0" cellpadding="0" border="0" width="100%" height="100%">
+						    				<tr>
+				    							<td colspan="2" width="50%" valign="center" align="left">{{matchplayer.player.firstname}}&nbsp;{{matchplayer.player.lastname}}</td>
+				    							<td colspan="2" width="50%" valign="center" align="right"><i class="icon ion-checkmark-round" ng-show="matchplayer.isBasePlayer"/></td>
+						    				</tr>
+						    			</table>
+						    		</div>
+						    	</div>
+						    </li>
+				    		<button class="button button-full button-stable">{{ 'MATCH_DETAIL_LBL_REPLACEMENTS' | translate }}</button>
+				    		<!--
+				    		//Show with arrow in front:
+				    		//	green arrow => in
+				    		//	red arrow => out ( show with indent )
+				    		-->
+						    <li class="item">
+						    	<div class="list list-inset">
+						    		<div class="item" ng-repeat="replacement in replacements">
+			        					<table cellspacing="0" cellpadding="0" border="0" width="100%" height="100%">
+						    				<tr>
+				    							<td colspan="2" width="15%" valign="center" align="center">{{replacement.minute}}'<!--'--></td>
+						    				</tr>
+						    				<tr>
+				    							<td width="10%" valign="center"><img src="img/ReplacementIn.png" width="20px" height="20px"/></td>
+						    					<td width="90%" valign="center" align="right">
+						    						{{replacement.playerIn.player.firstname}}&nbsp;{{replacement.playerIn.player.lastname}}
+						    					</td>
+						    				</tr>
+						    				<tr>
+				    							<td width="10%" valign="center"><img src="img/ReplacementOut.png" width="20px" height="20px"/></td>
+						    					<td width="90%" valign="center" align="right">
+						    						{{replacement.playerOut.player.firstname}}&nbsp;{{replacement.playerOut.player.lastname}}
+						    					</td>
+						    				</tr>
+						    			</table>
+						    		</div>
+						    	</div>
+						    </li>
+				    		<button class="button button-full button-stable">{{ 'MATCH_DETAIL_LBL_CARDS' | translate }}</button>
+						    <li class="item">
+						    	<div class="list list-inset">
+						    		<div class="item" ng-repeat="card in cards">
+				        				<table cellspacing="0" cellpadding="0" border="0" width="100%" height="100%">
+							        		<tr>
+				    							<td width="20%" valign="center"><img src="{{card.cardType.imageLink}}" width="20px" height="20px"/>&nbsp;&nbsp;{{card.minute}}'<!--'--></td>
+							        			<td width="80%" align="right">{{card.matchPlayer.player.firstname + " " + card.matchPlayer.player.lastname}}</td>
+							        		</tr>
+				        				</table>
 						    		</div>
 						    	</div>
 						    </li>
@@ -365,8 +498,8 @@ TTTTTT  T:::::T  TTTTTTeeeeeeeeeeee    aaaaaaaaaaaaa      mmmmmmm    mmmmmmm    
 	        		</label>
 		        	<br/>
 		        	<br/>
-			        <button class="button button-full button-balanced" ng-click="addTeam()" id="btnAddTeam">{{ 'MANAGE_TEAM_BUTTON_ADD' | translate }}</button>
-			        <button class="button button-full button-balanced" ng-click="updateTeam()" id="btnUpdateTeam" style="display:none">{{ 'MANAGE_TEAM_BUTTON_UPDATE' | translate }}</button>
+			        <button class="button button-block button-balanced" ng-click="addTeam()" id="btnAddTeam">{{ 'MANAGE_TEAM_BUTTON_ADD' | translate }}</button>
+			        <button class="button button-block button-balanced" ng-click="updateTeam()" id="btnUpdateTeam" style="display:none">{{ 'MANAGE_TEAM_BUTTON_UPDATE' | translate }}</button>
 		        	<br/>
 		        	<br/>
 		        	<br/>
@@ -398,7 +531,7 @@ TTTTTT  T:::::T  TTTTTTeeeeeeeeeeee    aaaaaaaaaaaaa      mmmmmmm    mmmmmmm    
 						</select>
 			        </label>
 		        	<br/>
-				    <button class="button button-full button-balanced" ng-click="addPlayer()">{{ 'TEAM_BUTTON_ADD_PLAYER' | translate }}</button>
+				    <button class="button button-block button-balanced" ng-click="addPlayer()">{{ 'TEAM_BUTTON_ADD_PLAYER' | translate }}</button>
 		        	<br/>
 				    <button class="button button-full button-stable">{{ 'TEAM_RIBBON_PLAYERS' | translate }}</button>
 					<ion-list can-swipe="true">
@@ -488,8 +621,8 @@ PPPPPPPPPP          llllllll  aaaaaaaaaa  aaaa    y:::::y            eeeeeeeeeee
 	        		</label>
 		        	<br/>
 		        	<br/>
-			        <button class="button button-full button-balanced" ng-click="addPlayer()" id="btnAddPlayer" >{{ 'PLAYERS_MANAGE_BTN_ADD' | translate }}</button>
-			        <button class="button button-full button-balanced" ng-click="updatePlayer()" id="btnUpdatePlayer" style="display:none">{{ 'PLAYERS_MANAGE_BTN_UPDATE' | translate }}</button>
+			        <button class="button button-block button-balanced" ng-click="addPlayer()" id="btnAddPlayer" >{{ 'PLAYERS_MANAGE_BTN_ADD' | translate }}</button>
+			        <button class="button button-block button-balanced" ng-click="updatePlayer()" id="btnUpdatePlayer" style="display:none">{{ 'PLAYERS_MANAGE_BTN_UPDATE' | translate }}</button>
 		        	<br/>
 		        	<br/>
 		        	<br/>
@@ -573,6 +706,21 @@ S:::::::::::::::SS   ee:::::::::::::e          tt:::::::::::tt    tt:::::::::::t
 						<label class="item item-radio">
     						<input type="radio" name="group" ng-model="preferredLang.value" value="nl" ng-change="changeLang(preferredLang)">
     						<div class="item-content">{{ 'LANG_DUTCH' | translate }}</div>
+							<i class="radio-icon ion-checkmark"></i>
+						</label>
+						<label class="item item-radio">
+    						<input type="radio" name="group" ng-model="preferredLang.value" value="de" ng-change="changeLang(preferredLang)">
+    						<div class="item-content">{{ 'LANG_GERMAN' | translate }}</div>
+							<i class="radio-icon ion-checkmark"></i>
+						</label>
+						<label class="item item-radio">
+    						<input type="radio" name="group" ng-model="preferredLang.value" value="es" ng-change="changeLang(preferredLang)">
+    						<div class="item-content">{{ 'LANG_SPANISH' | translate }}</div>
+							<i class="radio-icon ion-checkmark"></i>
+						</label>
+						<label class="item item-radio">
+    						<input type="radio" name="group" ng-model="preferredLang.value" value="pt" ng-change="changeLang(preferredLang)">
+    						<div class="item-content">{{ 'LANG_PORTUGEES' | translate }}</div>
 							<i class="radio-icon ion-checkmark"></i>
 						</label>
 					</div>

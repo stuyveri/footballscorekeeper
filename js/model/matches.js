@@ -6,6 +6,8 @@ function Match(idIn, teamIn, datePlayedIn, opponentIn, homeIn) {
 	this.home = homeIn;
 	this.periods = [];
 	this.matchplayers = [];
+	this.replacements = [];
+	this.cards = [];
 	
 	this.teamScore = 0;
 	this.opponentScore = 0;
@@ -33,13 +35,33 @@ function Goal(idIn, minuteIn, scoreTeamIn, scoreOppIn, isForTeamIn, playerIn, pe
 	this.period = periodIn;
 }
 
-function MatchPlayer(idIn, matchIn, playerIn) {
+function MatchPlayer(idIn, matchIn, playerIn, isBasePlayerIn) {
 	this.id = idIn;
 	this.match = matchIn;
 	this.player = playerIn;
+	this.isBasePlayer = isBasePlayerIn;
 }
 
+function Replacement(idIn, playerInIn, playerOutIn, minuteIn) {
+	this.id = idIn;
+	this.playerIn = playerInIn;
+	this.playerOut = playerOutIn;
+	this.minute = minuteIn;
+}
 
+function Card(idIn, matchPlayerIn, cardTypeIn, minuteIn) {
+	this.id = idIn;
+	this.matchPlayer = matchPlayerIn;
+	this.cardType = cardTypeIn;
+	this.minute = minuteIn;
+}
+
+function CardType(idIn, nameIn, descriptionIn, imageLinkIn) {
+	this.id = idIn;
+	this.name = nameIn;
+	this.description = descriptionIn;
+	this.imageLink = imageLinkIn;
+}
 
 function Teams() {
 	this.teams = [];
@@ -48,28 +70,6 @@ function Teams() {
 		if ( $.inArray(team, teams) == -1) {
 			this.teams.push( team );
 		}
-	}
-}
-
-function SavedData() {
-	this.dataVersion= variables.dataVersion;
-	this.softwareVersion= variables.softwareVersion;
-	this.teams = []; //list of TeamItem
-}
-	
-function addMatch(savedData, match) {
-	var found = false;
-	$.each( savedData.teams, function( i, val ) {
-		if( savedData.teams[i].team == match.team ) {
-			savedData.teams[i].matches.push( match );
-			found = true;
-		}
-	});
-	
-	if( !found ) {
-		//create TeamItem
-		var teamItem = new TeamItem(match);
-		savedData.teams.push( teamItem );
 	}
 }
 
@@ -87,6 +87,8 @@ function Player(idIn, firstnameIn, lastnameIn) {
 	this.checked;
 	this.nrOfMatches;
 	this.nrOfGoals;
+	this.isOnField = false;
+	this.replace = false;
 }
 
 function Setting(idIn, nameIn, valueIn) {

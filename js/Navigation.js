@@ -118,6 +118,12 @@ RRRRRRRR     RRRRRRR    uuuuuuuu  uuuunnnnnn    nnnnnn*/
 			//alert("resume called");
 			$rootScope.$broadcast("resumecalled");
 		});
+		//When the app comes back from background => eg update screen
+		$document.on("pause", function ( event ) {
+			console.log("pause called");
+			//alert("resume called");
+			$rootScope.$broadcast("pausecalled");
+		});
 	});
 })
 
@@ -140,7 +146,7 @@ H:::::::H     H:::::::H oo:::::::::::oo m::::m   m::::m   m::::m  ee::::::::::::
 HHHHHHHHH     HHHHHHHHH   ooooooooooo   mmmmmm   mmmmmm   mmmmmm    eeeeeeeeeeeeee          CCCCCCCCCCCCC   ooooooooooo     nnnnnn    nnnnnn          ttttttttttt  rrrrrrr               ooooooooooo   llllllllllllllll    eeeeeeeeeeeeee   rrrrrrr            
 */
 
-.controller('HomeController', function($scope, $ionicActionSheet, $location, $ionicPlatform, $ionicPopup, translationService, currentMatchService, MatchService, SettingsService) {
+.controller('HomeController', function($scope, $ionicActionSheet, $location, $ionicPlatform, $ionicPopup, translationService, currentMatchService, MatchService, SettingsService, CardsService) {
 	$scope.teams;
 	$scope.fileData;
 
@@ -157,10 +163,15 @@ HHHHHHHHH     HHHHHHHHH   ooooooooooo   mmmmmm   mmmmmm   mmmmmm    eeeeeeeeeeee
 			SettingsService.getAllSettings(successAllSettings, error);
 		}
 
+		//Check if there is any card that is not null => get it
+		if( variables.CARD_YELLOW == null ) {
+			CardsService.getAllCardTypes(successAllCardTypes, error);
+		}
+
 		currentMatchService.initDone = true;
 	});
 
-		    	console.log("HomeController.barFooter called");
+	console.log("HomeController.barFooter called");
 	$("#barFooter").show();
 	screen.unlockOrientation();
 
@@ -170,7 +181,7 @@ HHHHHHHHH     HHHHHHHHH   ooooooooooo   mmmmmm   mmmmmm   mmmmmm    eeeeeeeeeeee
 	};
 
 	$scope.insertMatches = function(match) {
-					MatchService.addMatches(successForward, error);
+		MatchService.addMatches(successForward, error);
 	};
 
 
@@ -230,6 +241,16 @@ HHHHHHHHH     HHHHHHHHH   ooooooooooo   mmmmmm   mmmmmm   mmmmmm    eeeeeeeeeeee
 				}
 			})
 		);
+	};
+
+	function successAllCardTypes()  {
+		console.log("HomeController.successAllCardTypes called");
+		
+		var cardTypes = CardsService.cardTypes;
+
+		variables.CARD_YELLOW = cardTypes[0];
+		variables.CARD_RED = cardTypes[1];
+		variables.CARD_YELLOW_TO_RED = cardTypes[2];
 	};
 
 	function error(err) {
@@ -526,8 +547,6 @@ S:::::::::::::::SS  oo:::::::::::oo   cc:::::::::::::::c  cc:::::::::::::::c  ee
 	
 	$scope.addPeriod = function() { 
 		console.log("addPeriod called.");
-		//TODO: $compile
-		//$("#newPeriod").before( "<div class='row' id='period" + $scope.periodCounter + "'><label class='item item-input is-required{{ frmNewMatch.txtPeriodLen" + $scope.periodCounter + ".$error.required ? ' has-error' : '' }}'><span class='input-label'>Period " + $scope.periodCounter + "</span><input type='number' ng-model='txtPeriodLen" + $scope.periodCounter + "' id='txtPeriodLen" + $scope.periodCounter + "' name='txtPeriodLen" + $scope.periodCounter + "' placeholder='Length' ng-required='true'/></label></div>" );
 		$scope.html = "<div class='row' id='period" + $scope.periodCounter + "'><label class='item item-input is-required{{ frmNewMatch.txtPeriodLen" + $scope.periodCounter + ".$error.required ? ' has-error' : '' }}'><span class='input-label'>Period " + $scope.periodCounter + "</span><input type='number' ng-model='txtPeriodLen" + $scope.periodCounter + "' id='txtPeriodLen" + $scope.periodCounter + "' name='txtPeriodLen" + $scope.periodCounter + "' placeholder='Length' ng-required='true'/></label></div>";
 		
         var el = angular.element($scope.html);
@@ -541,45 +560,6 @@ S:::::::::::::::SS  oo:::::::::::oo   cc:::::::::::::::c  cc:::::::::::::::c  ee
 	$scope.startMatch = function() { 
 		console.log("startMatch called.");
 		var valid = false;
-
-/*
-		//Validation
-		if( $scope.team == "" || $scope.team == null ) {
-			console.log("validation issue.");
-			$("#lblTeam").addClass("has-error");
-			valid = false;
-		}
-		var opponent = $("#txtOpponent");
-		alert(angular.element("#txtOpponent").$error.required);
-		if( opponent.val() == "" || opponent.val() == null ) {;
-			$("#lblOpponent").addClass("has-error");
-			valid = false;
-		}
-		var date = $("#txtDate");
-		if( date.val() == "" || date.val() == null ) {
-			$("#lblDate").addClass("has-error");
-			valid = false;
-		}
-		$( "input[id*='txtPeriodLen']" ).each( function(index) { 
-			if( isInt( $( this ).val() ) ) {
-				$( this ).addClass("has-error");
-				valid = false;
-			}
-		});
-		//make sure at least 1 player is selected
-		var cnt = 0;
-		$.each($scope.playersforteam, function(index, player) {
-			//check if checkbox is selected
-			if( player.checked ) {
-				cnt++;
-			}
-		});
-		if( cnt == 0 ) {
-			valid = false;
-			$("#lstPlayers").addClass("has-error");
-		}
-*/
-
 		
 		//Fill match & teams
 		currentMatchService.matchId = currentMatchService.matchId + 1;
@@ -597,19 +577,29 @@ S:::::::::::::::SS  oo:::::::::::oo   cc:::::::::::::::c  cc:::::::::::::::c  ee
 			}
 		});
 		
+		currentMatchService.playersForTeam.length = 0;
+		var nrOfBasePlayers = 0;
 		$.each($scope.playersforteam, function(index, player) {
 			//check if checkbox is selected
 			if( player.checked ) {
 				valid = true;
 				currentMatchService.matchPlayerId = currentMatchService.matchPlayerId + 1;
 				console.log("startMatch, adding matchplayer:" + player.lastname + ' & Id: ' + currentMatchService.matchPlayerId);
-				var matchplayer = new MatchPlayer( currentMatchService.matchPlayerId, currentMatchService.currentMatch, player );
+				//when the player is on the field at match creation time, it means he is a base player
+				var matchplayer = new MatchPlayer( currentMatchService.matchPlayerId, currentMatchService.currentMatch, player, player.isOnField );
 				currentMatchService.currentMatch.matchplayers.push( matchplayer );
 				currentMatchService.playersForTeam.push( matchplayer.player );
+
+				if( player.isOnField ) {
+					nrOfBasePlayers++;
+				}
 			}
 		});
-		
-		//console.log("currentMatchService.playersForTeam:" + angular.toJson(currentMatchService.playersForTeam));
+
+		//there should be at least one baseplayer
+		if( nrOfBasePlayers == 0 ) {
+			valid = false;
+		}
 			
 		if( valid ) {
 			$location.path('/startMatch');
@@ -675,7 +665,7 @@ M::::::M               M::::::Ma:::::aaaa::::::a      tt::::::::::::::t c:::::::
 M::::::M               M::::::M a::::::::::aa:::a       tt:::::::::::tt  cc:::::::::::::::ch:::::h     h:::::h     CCC::::::::::::C oo:::::::::::oo   n::::n    n::::n        tt:::::::::::ttr:::::r             oo:::::::::::oo l::::::ll::::::l  ee:::::::::::::e   r:::::r            
 MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      cccccccccccccccchhhhhhh     hhhhhhh        CCCCCCCCCCCCC   ooooooooooo     nnnnnn    nnnnnn          ttttttttttt  rrrrrrr               ooooooooooo   llllllllllllllll    eeeeeeeeeeeeee   rrrrrrr            
 */
-.controller('MatchController', function($scope, $location, $ionicPopup, $ionicModal, $translate, currentMatchService, PlayerService, MatchService) {
+.controller('MatchController', function($scope, $location, $ionicPopup, $ionicModal, $translate, $filter, $timeout, currentMatchService, PlayerService, MatchService) {
 
 	$scope.currentMatch = currentMatchService.currentMatch;
 	$scope.periodStartTime = currentMatchService.periodStartTime;
@@ -683,9 +673,14 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 	$scope.currentPeriod = null;
 	$scope.minutes = '00';
 	$scope.seconds = '00';
-	$scope.playersForTeam = currentMatchService.playersForTeam;
+	$scope.playersForTeam = currentMatchService.currentMatch.matchplayers;
 	$scope.lastGoal;
 	$scope.isSaved = false;
+	$scope.matchStatus = MatchStatusEnum.NOT_STARTED;
+	$scope.CARD_YELLOW = variables.CARD_YELLOW;
+	$scope.CARD_RED = variables.CARD_RED;
+	$scope.CARD_YELLOW_TO_RED = variables.CARD_YELLOW_TO_RED;
+	$scope.matchPlayerWithCard = -1;
 
 	//do not display header
 	$("#barHeader").hide();
@@ -697,16 +692,45 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 	$scope.$on('resumecalled', function(event, args) {
 		console.log("resumecalled called");
 
-		//alert("resume called .ON");
-		$scope.$apply(
-			function() {
-				$scope.updateDisplay();
-			}
-		);
+		variables.isInPause = false;
+		//Only update display when period is ongoing
+		if( $scope.matchStatus == MatchStatusEnum.PERIOD_ONGOING ) {
+			//alert("resume called .ON");
+			$scope.$apply(
+				function() {
+					$scope.updateDisplay();
+				}
+			);
+		}
+	});
+
+	//When the app comes back from background => update screen
+	$scope.$on('pausecalled', function(event, args) {
+		console.log("pausecalled called");
+
+		variables.isInPause = true;
 	});
 
 	$ionicModal.fromTemplateUrl('modal/selectPlayer.html', function($ionicModal) {
 		$scope.modal = $ionicModal;
+	}, {
+	    // Use our scope for the scope of the modal to keep it simple
+	    scope: $scope,
+	    // The animation we want to use for the modal entrance
+	    animation: 'slide-in-up'
+	});
+
+	$ionicModal.fromTemplateUrl('modal/replacePlayers.html', function($ionicModal) {
+		$scope.modalReplacements = $ionicModal;
+	}, {
+	    // Use our scope for the scope of the modal to keep it simple
+	    scope: $scope,
+	    // The animation we want to use for the modal entrance
+	    animation: 'slide-in-up'
+	});
+
+	$ionicModal.fromTemplateUrl('modal/cardPlayer.html', function($ionicModal) {
+		$scope.modalCard = $ionicModal;
 	}, {
 	    // Use our scope for the scope of the modal to keep it simple
 	    scope: $scope,
@@ -738,14 +762,10 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 		}
 	};
 	
-	$scope.addGoal = function(isHomeTeam) { 
-		console.log("addGoal called.");
+	$scope.calcMinutes = function() { 
 		var currentTime = new Date();		
 		var milis = currentTime.valueOf() - $scope.periodStartTime.valueOf();
 		var diffTime = new Date(milis);
-
-		currentMatchService.goalId = currentMatchService.goalId + 1;
-		console.log("startMatch, goalId: " + currentMatchService.goalId);
 		//Minutes:
 		//	if higher then period.length => go for period.length
 		//	add 1 minute
@@ -760,6 +780,16 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 			}
         }
 
+        return minute;
+	};
+	
+	$scope.addGoal = function(isHomeTeam) { 
+		console.log("addGoal called.");
+
+		currentMatchService.goalId = currentMatchService.goalId + 1;
+		console.log("startMatch, goalId: " + currentMatchService.goalId);
+
+		var minute = $scope.calcMinutes();
 		var goal = new Goal(currentMatchService.goalId, minute, currentMatchService.currentMatch.teamScore, currentMatchService.currentMatch.opponentScore, isHomeTeam, null, $scope.currentPeriod);
 		$scope.currentPeriod.goals.push( goal );
 		$scope.lastGoal = goal;
@@ -775,6 +805,87 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 		}
 
 		console.log("addGoal end: " + goal);
+	};
+
+	$scope.startReplacement = function(isHomeTeam) {
+		$scope.modalReplacements.show();
+	};
+
+	$scope.doReplacements = function(isHomeTeam) {
+		//From Modal, all the replacements have been entered
+		//Validation:
+		//	- nr of players on must equal nr of players off
+		//fill lists playerOnField and playerOffField
+
+		var matchPlayersOnFieldToReplace1 = $filter('filter')(currentMatchService.currentMatch.matchplayers, { player : { isOnField : true } });
+		var matchPlayersOffFieldToReplace1 = $filter('filter')(currentMatchService.currentMatch.matchplayers, { player : { isOnField : false } });
+
+		var matchPlayersOnFieldToReplace = $filter('filter')(matchPlayersOnFieldToReplace1, { player : { replace : true } });
+		var matchPlayersOffFieldToReplace = $filter('filter')(matchPlayersOffFieldToReplace1, { player : { replace : true } });
+
+		//check
+		if( matchPlayersOnFieldToReplace.length != matchPlayersOffFieldToReplace.length ) {
+			$translate(['MATCH_REPLACEMENT_VALIDATION_POPUP_TITLE', 'MATCH_REPLACEMENT_VALIDATION_POPUP_TEMPLATE']).then(function (translations) {
+				$ionicPopup.alert({
+					title: translations.MATCH_REPLACEMENT_VALIDATION_POPUP_TITLE,
+					template: translations.MATCH_REPLACEMENT_VALIDATION_POPUP_TEMPLATE
+				});
+			});
+		} else {
+			$.each(matchPlayersOnFieldToReplace, function(index, matchplayer) {
+				console.log("matchPlayersOnFieldToReplace player id: " + matchplayer.player.id);
+				matchplayer.player.replace = false;
+				matchplayer.player.isOnField = false;
+			});
+
+			$.each(matchPlayersOffFieldToReplace, function(index, matchplayer) {
+				console.log("matchPlayersOffFieldToReplace player id: " + matchplayer.player.id);
+				matchplayer.player.replace = false;
+				matchplayer.player.isOnField = true;
+			});
+
+			var minute = $scope.calcMinutes();
+			//create replacements objects. Beware, the list for players on field were changed to players off field
+			$.each(matchPlayersOnFieldToReplace, function(index, matchPlayerOffField) {
+				console.log("create replacement player id: " + matchPlayerOffField.player.id);
+				var replacement = new Replacement( -1, matchPlayersOffFieldToReplace[index], matchPlayerOffField, minute );
+				currentMatchService.currentMatch.replacements.push( replacement )
+			});
+		}
+
+		$scope.modalReplacements.hide();
+	};
+
+	$scope.doCard = function(cardType) {
+		console.log("doCard called: " + cardType.id);
+		var matchPlayerWithCardId = $("input[name=rdPlayerCard]:checked").val();
+		console.log("Player for card: " + matchPlayerWithCardId);
+
+		if( matchPlayerWithCardId != null ) {
+			var matchPlayersWithCard = $filter('filter')(currentMatchService.currentMatch.matchplayers, { id : matchPlayerWithCardId });
+			var matchPlayerWithCard = matchPlayersWithCard[0];
+			console.log("Player for card2: " + matchPlayerWithCard.id);
+
+			var minute = $scope.calcMinutes();
+			var card = new Card(-1, matchPlayerWithCard, cardType, minute);
+			currentMatchService.currentMatch.cards.push( card );
+
+			$scope.modalCard.hide();
+		} else {
+			$translate(['MATCH_CARD_VALIDATION_POPUP_TITLE', 'MATCH_CARD_VALIDATION_POPUP_TEMPLATE']).then(function (translations) {
+				$ionicPopup.alert({
+					title: translations.MATCH_CARD_VALIDATION_POPUP_TITLE,
+					template: translations.MATCH_CARD_VALIDATION_POPUP_TEMPLATE
+				});
+			});
+		}
+	};
+
+	$scope.startCard = function() {
+		console.log("startCard called");
+
+		$scope.matchPlayerWithCard == null;
+		$scope.modalCard.show();
 	};
 
 	$scope.doTwitterGoal = function() {
@@ -865,17 +976,22 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 	
 	$scope.startPeriod = function() { 
 		console.log("startPeriod called.");
+		$scope.matchStatus = MatchStatusEnum.PERIOD_ONGOING;
+		variables.isInPause = false;
+
 		$scope.periodStartTime = new Date();
 
         $scope.minutes = '00';
         $scope.seconds = '00';
 		
 		$("#btnStartPeriod").hide();
-		$("#btnUpdateDisplay").show();
+		//$("#btnUpdateDisplay").show();
 		$("#btnAddToTeam1").show();
 		$("#btnAddToTeam2").show();
 		$("#btnAddToOpponent1").show();
 		$("#btnAddToOpponent2").show();
+		$("#btnDoReplacement").show();
+		$("#imgDoCard").show();
 
 		if( $scope.periodCounter == -1 ) {
 			//doTwitterStartMatch
@@ -887,6 +1003,8 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 		if( ($scope.periodCounter + 1) < $scope.currentMatch.periods.length ) {
 			$scope.periodCounter++;
 			$scope.currentPeriod = $scope.currentMatch.periods[$scope.periodCounter];
+
+			$scope.startUpdateDisplayTimer();
 		} else {
 			$translate(['MATCH_STARTPERIOD_POPUP_TITLE', 'MATCH_STARTPERIOD_POPUP_TEMPLATE']).then(function (translations) {
 				$ionicPopup.alert({
@@ -896,6 +1014,20 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 			});
 		}
 	};
+
+	$scope.startUpdateDisplayTimer = function() {
+		//console.log("startUpdateDisplayTimer called.");
+		
+		if(!variables.isInPause && $scope.matchStatus == MatchStatusEnum.PERIOD_ONGOING) {
+			$timeout(
+				//This must be wrapped in a function, otherwise it will just run wild
+				function() { $scope.updateDisplay(); }, 
+				1000,
+				true
+			);
+		}
+	};
+
 	
 	$scope.updateDisplay = function() {
 		console.log("updateDisplay called.");
@@ -917,20 +1049,28 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
         }
         
         if( $scope.currentPeriod.length > diffTime.getMinutes() ) {
+        	//PERIOD STILL ONGOING
 	        $scope.minutes = minutesValue;
-	        $scope.seconds = secondsValue;
+	        $scope.seconds = secondsValue;	        
+
+	        //Start timeout to recall update
+			$scope.startUpdateDisplayTimer();
 	    } else {
+			$scope.matchStatus = MatchStatusEnum.PERIOD_ENDED;
 	        $scope.minutes = $scope.currentPeriod.length;
 	        $scope.seconds = '00';
 
 			if( ($scope.periodCounter + 1) == $scope.currentMatch.periods.length ) {
 		        //show Save button
+		        //All periods ended
+				$scope.matchStatus = MatchStatusEnum.MATCH_ENDED;
+
 				$("#btnSaveData").show();
 				$("#btnStartPeriod").hide();
-				$("#btnUpdateDisplay").hide();
+				//$("#btnUpdateDisplay").hide();
 			} else {
 				$("#btnStartPeriod").show();
-				$("#btnUpdateDisplay").hide();
+				//$("#btnUpdateDisplay").hide();
 			}
 
 			$translate(['MATCH_PERIODPASSED_POPUP_TITLE', 'MATCH_PERIODPASSED_POPUP_TEMPLATE']).then(function (translations) {
@@ -959,6 +1099,8 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 		$("#btnAddToTeam2").hide();
 		$("#btnAddToOpponent1").hide();
 		$("#btnAddToOpponent2").hide();
+		$("#btnDoReplacement").hide();
+		$("#imgDoCard").hide();
 
 		MatchService.insertMatch(currentMatchService.currentMatch, success, error);
 	};
@@ -974,6 +1116,7 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 				});
 				confirmPopup.then(function(res) {
 					if(res) {
+						$scope.matchStatus = MatchStatusEnum.MATCH_STOPPED;
 						$location.path('/');
 					} else {
 		       			console.log('You are not sure');
@@ -1000,6 +1143,7 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 			}
 		);
 		$scope.isSaved = true;
+		$("#btnSaveData").hide();
 		$scope.doTwitterEndMatch();
 	};
 
@@ -1030,9 +1174,41 @@ M::::::M               M::::::Ma:::::aaaa::::::a      tt::::::::::::::t c:::::::
 M::::::M               M::::::M a::::::::::aa:::a       tt:::::::::::tt  cc:::::::::::::::ch:::::h     h:::::hD::::::::::::DDD       ee:::::::::::::e          tt:::::::::::tt a::::::::::aa:::ai::::::il::::::l    CCC::::::::::::C oo:::::::::::oo   n::::n    n::::n        tt:::::::::::ttr:::::r             oo:::::::::::oo l::::::ll::::::l  ee:::::::::::::e   r:::::r            
 MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      cccccccccccccccchhhhhhh     hhhhhhhDDDDDDDDDDDDD            eeeeeeeeeeeeee            ttttttttttt    aaaaaaaaaa  aaaaiiiiiiiillllllll       CCCCCCCCCCCCC   ooooooooooo     nnnnnn    nnnnnn          ttttttttttt  rrrrrrr               ooooooooooo   llllllllllllllll    eeeeeeeeeeeeee   rrrrrrr            
 */
-.controller('MatchDetailController', function($scope, currentMatchService) {
+.controller('MatchDetailController', function($scope, $ionicPopup, currentMatchService, MatchService) {
 
 	$scope.currentMatch = currentMatchService.currentMatch;
+	$scope.replacements;
+	$scope.cards;
+
+	MatchService.getReplacementsByMatchId(currentMatchService.currentMatch, successReplacements, error);
+	MatchService.getCardsByMatchId(currentMatchService.currentMatch, successCards, error);
+
+
+	function successReplacements()  {
+		console.log("successReplacements.success called");
+		$scope.$apply(
+			function() {
+				$scope.replacements = MatchService.replacements;
+			}
+		);
+	};
+
+	function successCards()  {
+		console.log("successCards.success called");
+		$scope.$apply(
+			function() {
+				$scope.cards = MatchService.cards;
+			}
+		);
+	};
+
+	function error(err) {
+    	console.log("Error processing SQL: " + angular.toJson(err));
+		$ionicPopup.alert({
+			title: 'Save Match',
+			template: 'Database Error: ' + angular.toJson(err)
+		});
+	};
 })
 
 /*
