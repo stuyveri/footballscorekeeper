@@ -155,7 +155,7 @@ TTTTTT  T:::::T  TTTTTTeeeeeeeeeeee    aaaaaaaaaaaaa      mmmmmmm    mmmmmmm   S
 							"	 WHERE" +
 							"		Team.Id = " + team.id +
 							"		AND Goal.IsForMyTeam = 1" +
-							"		AND GoalScorer.Type = " + variables.UNDEFINED_TYPE +
+							"		AND GoalScorer.Type = " + variables.PLAYER_TYPE +
 							"	 GROUP BY" +
 							"		GoalScorer.Id" +
 							")", 
@@ -259,7 +259,7 @@ PPPPPPPPPP          llllllll  aaaaaaaaaa  aaaa    y:::::y            eeeeeeeeeee
 
 			variables.db.transaction(function(tx) {
 
-					tx.executeSql('SELECT Id, FirstName, LastName FROM Player WHERE Type = 0 ORDER BY LastName asc', [], doPlayers, fnError); 
+					tx.executeSql('SELECT Id, FirstName, LastName FROM Player WHERE Type = ' + variables.PLAYER_TYPE + ' ORDER BY LastName asc', [], doPlayers, fnError); 
 				}, 
 				fnError, 
 				fnSuccess
@@ -269,7 +269,7 @@ PPPPPPPPPP          llllllll  aaaaaaaaaa  aaaa    y:::::y            eeeeeeeeeee
 
 			variables.db.transaction(function(tx) {
 
-					tx.executeSql('INSERT INTO Player(FirstName, LastName, Type) VALUES ("' + player.firstname + '", "' + player.lastname + '", 0)'); 
+					tx.executeSql('INSERT INTO Player(FirstName, LastName, Type) VALUES ("' + player.firstname + '", "' + player.lastname + '", ' + variables.PLAYER_TYPE + ')'); 
 				}, 
 				fnError, 
 				fnSuccess

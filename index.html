@@ -195,12 +195,16 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 				</ion-header-bar>
 				<ion-content>
 					<!-- 
-						- list players, onclick => player selected
-						- if wrong player => pop and redo
+					//	- list players, onclick => player selected
+					//	- if wrong player => pop and redo
 					-->
 					<ion-list>
 						<ion-item ng-repeat="matchplayer in playersForTeam | filter:{ player : { isOnField : true } }" ng-click="choosePlayer(matchplayer.player)">{{matchplayer.player.firstname}}&nbsp;{{matchplayer.player.lastname}}</ion-item>
 					</ion-list>
+			        <br/>
+					<!-- 
+					//	- No button here, more logic is already processed and no undo possible
+					-->
 				</ion-content>
 			</ion-modal-view>
 		</script>
@@ -230,7 +234,11 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 			        		</td>
 			        	</tr>
 			        </table>
-			        <button class="button button-block button-balanced" ng-click="doReplacements()" id="btnDoReplacements">{{ 'MATCH_MODAL_REPLACEMENT_BUTTON_DO_REPLACEMENT' | translate }}</button>
+		        	<div class="content padding">
+				        <button class="button button-block button-balanced" ng-click="doReplacements()" id="btnDoReplacements">{{ 'MATCH_MODAL_REPLACEMENT_BUTTON_DO_REPLACEMENT' | translate }}</button>
+				        <br/>
+				        <button class="button button-block button-balanced" ng-click="modalReplacements.hide()">{{ 'MATCH_MODAL_REPLACEMENT_BUTTON_CANCEL' | translate }}</button>
+			        </div>
 				</ion-content>
 			</ion-modal-view>
 		</script>
@@ -267,6 +275,10 @@ MMMMMMMM               MMMMMMMM  aaaaaaaaaa  aaaa         ttttttttttt      ccccc
 				    		<td width="33%" align="center"><img src="img/YellowRedCard.png" ng-click="doCard(CARD_YELLOW_TO_RED)"/></td>
 				    	</tr>
 				    </table>
+			        <br/>
+		        	<div class="content padding">
+			        	<button class="button button-block button-balanced" ng-click="modalCard.hide()">{{ 'MATCH_MODAL_CARD_BUTTON_CANCEL' | translate }}</button>
+			        </div>
 				</ion-content>
 			</ion-modal-view>
 		</script>
@@ -462,7 +474,6 @@ TTTTTT  T:::::T  TTTTTTeeeeeeeeeeee    aaaaaaaaaaaaa      mmmmmmm    mmmmmmm    
 				<ion-content ng-controller="TeamsController">
 		        	<br/>
 		        	<br/>
-		        	<br/>
 		        	<!--
 					//Show list
 					//	Teams
@@ -470,7 +481,17 @@ TTTTTT  T:::::T  TTTTTTeeeeeeeeeeee    aaaaaaaaaaaaa      mmmmmmm    mmmmmmm    
 					//  Delete, Edit => swipe
 		        	-->
 					<ion-list can-swipe="true">
-						<ion-item ng-repeat="team in teams" ng-click="details(team)">{{team.name}}
+						<ion-item ng-repeat="team in teams" ng-click="details(team)">
+						    <table cellspacing="0" cellpadding="0" border="0" width="100%">
+						    	<tr>
+						    		<td width="99%">
+						    			<span class="title">{{team.name}}</span>
+						    		</td>
+						    		<td align="right">
+						    			<i class="icon ion-chevron-right"></i>
+						    		</td>
+						    	</tr>
+						    </table>
 							<ion-option-button class="button-assertive" ng-click="delete(team)">{{ 'TEAMS_DELETE' | translate }}</ion-option-button>
 							<ion-option-button class="button-positive" ng-click="edit(team)">{{ 'TEAMS_EDIT' | translate }}</ion-option-button>
 						</ion-item>
@@ -490,19 +511,22 @@ TTTTTT  T:::::T  TTTTTTeeeeeeeeeeee    aaaaaaaaaaaaa      mmmmmmm    mmmmmmm    
 					<h1 class="title">{{ 'MANAGE_TEAM_TITLE' | translate }}</h1>
 				</div>
 				<ion-content ng-controller="TeamController">
-		        	<br/>
-		        	<br/>
-		        	<br/>
-	        		<label class="item item-input">
-	        			<input type="text" id="txtNewTeam" placeholder="Team Name" ng-model="teamName"/>
-	        		</label>
-		        	<br/>
-		        	<br/>
-			        <button class="button button-block button-balanced" ng-click="addTeam()" id="btnAddTeam">{{ 'MANAGE_TEAM_BUTTON_ADD' | translate }}</button>
-			        <button class="button button-block button-balanced" ng-click="updateTeam()" id="btnUpdateTeam" style="display:none">{{ 'MANAGE_TEAM_BUTTON_UPDATE' | translate }}</button>
-		        	<br/>
-		        	<br/>
-		        	<br/>
+					<form name="frmManageTeam" novalidate>
+			        	<br/>
+			        	<br/>
+		        		<label class="item item-input is-required">
+		        			<input type="text" id="txtNewTeam" placeholder="Team Name" ng-model="teamName" ng-required="true" ng-maxlength="75"/>
+		        		</label>
+			        	<br/>
+			        	<br/>
+			        	<div class="content padding">
+					        <button class="button button-block button-balanced" ng-click="addTeam()" id="btnAddTeam" ng-disabled="frmManageTeam.$invalid">{{ 'MANAGE_TEAM_BUTTON_ADD' | translate }}</button>
+					        <button class="button button-block button-balanced" ng-click="updateTeam()" id="btnUpdateTeam" style="display:none" ng-disabled="frmManageTeam.$invalid">{{ 'MANAGE_TEAM_BUTTON_UPDATE' | translate }}</button>
+				        </div>
+			        	<br/>
+			        	<br/>
+			        	<br/>
+		        	</form>
 				</ion-content>
 			</ion-view>
 		</script>
@@ -514,35 +538,40 @@ TTTTTT  T:::::T  TTTTTTeeeeeeeeeeee    aaaaaaaaaaaaa      mmmmmmm    mmmmmmm    
 					<h1 class="title">{{ 'TEAM_TITLE' | translate }}</h1>
 				</div>
 				<ion-content ng-controller="TeamController">
-		        	<br/>
-		        	<br/>
-		        	<br/>
-		        	<h1>{{team.name}}</h1>
-		        	<br/>
-				    <div class="button button-full button-stable">{{ 'TEAM_RIBBON_MATCHES' | translate }}{{ teamNrOfMatches }}</div>
-				    <div class="button button-full button-stable">{{ 'TEAM_RIBBON_GOALS' | translate }}{{ teamNrOfGoalsScored }}&nbsp;/&nbsp;{{ teamNrOfGoalsAgainst }}</div>
-				    <div class="button button-full button-stable">{{ 'TEAM_RIBBON_TOPSCORER' | translate }}{{topscorer.firstname}}&nbsp;{{topscorer.lastname}}</div>
-		        	<br/>
-  					<label class="item item-input item-select">
-					    <div class="input-label">{{ 'TEAM_LIST_PLAYERS' | translate }}</div>
-						<select ng-model="playerToAdd">
-							<option value="">{{ 'TEAM_SELECT_CHOOSE_PLAYER' | translate }}</option>
-							<option ng-repeat="player in players" value="{{player.id}}">{{player.firstname}}&nbsp;{{player.lastname}}</option>
-						</select>
-			        </label>
-		        	<br/>
-				    <button class="button button-block button-balanced" ng-click="addPlayer()">{{ 'TEAM_BUTTON_ADD_PLAYER' | translate }}</button>
-		        	<br/>
-				    <button class="button button-full button-stable">{{ 'TEAM_RIBBON_PLAYERS' | translate }}</button>
-					<ion-list can-swipe="true">
-						<ion-item ng-repeat="player in teamplayers">{{player.firstname}}&nbsp;{{player.lastname}}
-							<ion-option-button class="button-assertive" ng-click="deletePlayer(player)">{{ 'TEAM_DELETE' | translate }}</ion-option-button>
-						</ion-item>
-					</ion-list>
-		        	<br/>
-		        	<br/>
-		        	<br/>
-		        	<br/>
+					<form name="frmTeam" novalidate>
+			        	<br/>
+			        	<br/>
+			        	<div class="content padding">
+			        		<h1>{{team.name}}</h1>
+				        </div>
+			        	<br/>
+					    <div class="button button-full button-stable">{{ 'TEAM_RIBBON_MATCHES' | translate }}{{ teamNrOfMatches }}</div>
+					    <div class="button button-full button-stable">{{ 'TEAM_RIBBON_GOALS' | translate }}{{ teamNrOfGoalsScored }}&nbsp;/&nbsp;{{ teamNrOfGoalsAgainst }}</div>
+					    <div class="button button-full button-stable">{{ 'TEAM_RIBBON_TOPSCORER' | translate }}{{topscorer.firstname}}&nbsp;{{topscorer.lastname}}</div>
+			        	<br/>
+	  					<label class="item item-input item-select">
+						    <div class="input-label">{{ 'TEAM_LIST_PLAYERS' | translate }}</div>
+							<select ng-model="playerToAdd" ng-required="true">
+								<option value="">{{ 'TEAM_SELECT_CHOOSE_PLAYER' | translate }}</option>
+								<option ng-repeat="player in players" value="{{player.id}}">{{player.firstname}}&nbsp;{{player.lastname}}</option>
+							</select>
+				        </label>
+			        	<br/>
+			        	<div class="content padding">
+					    	<button class="button button-block button-balanced" ng-click="addPlayer()" ng-disabled="frmTeam.$invalid">{{ 'TEAM_BUTTON_ADD_PLAYER' | translate }}</button>
+				        </div>
+			        	<br/>
+					    <button class="button button-full button-stable">{{ 'TEAM_RIBBON_PLAYERS' | translate }}</button>
+						<ion-list can-swipe="true">
+							<ion-item ng-repeat="player in teamplayers">{{player.firstname}}&nbsp;{{player.lastname}}
+								<ion-option-button class="button-assertive" ng-click="deletePlayer(player)">{{ 'TEAM_DELETE' | translate }}</ion-option-button>
+							</ion-item>
+						</ion-list>
+			        	<br/>
+			        	<br/>
+			        	<br/>
+			        	<br/>
+		        	</form>
 				</ion-content>
 			</ion-view>
 		</script>
@@ -587,9 +616,18 @@ PPPPPPPPPP          llllllll  aaaaaaaaaa  aaaa    y:::::y            eeeeeeeeeee
 					-->
 		        	<br/>
 		        	<br/>
-		        	<br/>
 					<ion-list can-swipe="true">
-						<ion-item ng-repeat="player in players" ng-click="details(player)">{{player.firstname}}&nbsp;{{player.lastname}}
+						<ion-item ng-repeat="player in players" ng-click="details(player)">
+						    <table cellspacing="0" cellpadding="0" border="0" width="100%">
+						    	<tr>
+						    		<td width="99%">
+						    			<span class="title">{{player.firstname}}&nbsp;{{player.lastname}}</span>
+						    		</td>
+						    		<td>
+						    			<i class="icon ion-chevron-right"></i>
+						    		</td>
+						    	</tr>
+						    </table>
 							<ion-option-button class="button-assertive" ng-click="delete(player)">{{ 'PLAYERS_SLIDEACTION_DEL' | translate }}</ion-option-button>
 							<ion-option-button class="button-positive" ng-click="edit(player)">{{ 'PLAYERS_SLIDEACTION_EDIT' | translate }}</ion-option-button>
 						</ion-item>
@@ -609,24 +647,26 @@ PPPPPPPPPP          llllllll  aaaaaaaaaa  aaaa    y:::::y            eeeeeeeeeee
 					<h1 class="title">{{ 'PLAYERS_MANAGE_TITLE' | translate }}</h1>
 				</div>
 				<ion-content ng-controller="PlayerController">
-		        	<br/>
-		        	<br/>
-		        	<br/>
-		        	<br/>
-	        		<label class="item item-input">
-	        			<input type="text" placeholder="{{ 'PLAYERS_MANAGE_PLACEHOLDER_FIRSTNAME' | translate }}" ng-model="firstName"/>
-	        		</label>
-	        		<label class="item item-input">
-	        			<input type="text" placeholder="{{ 'PLAYERS_MANAGE_PLACEHOLDER_LASTNAME' | translate }}" ng-model="lastName"/>
-	        		</label>
-		        	<br/>
-		        	<br/>
-			        <button class="button button-block button-balanced" ng-click="addPlayer()" id="btnAddPlayer" >{{ 'PLAYERS_MANAGE_BTN_ADD' | translate }}</button>
-			        <button class="button button-block button-balanced" ng-click="updatePlayer()" id="btnUpdatePlayer" style="display:none">{{ 'PLAYERS_MANAGE_BTN_UPDATE' | translate }}</button>
-		        	<br/>
-		        	<br/>
-		        	<br/>
-		        	<br/>
+					<form name="frmManagePlayer" novalidate>
+			        	<br/>
+			        	<br/>
+		        		<label class="item item-input is-required">
+		        			<input type="text" placeholder="{{ 'PLAYERS_MANAGE_PLACEHOLDER_FIRSTNAME' | translate }}" ng-model="firstName" ng-required="true" ng-maxlength="75"/>
+		        		</label>
+		        		<label class="item item-input is-required">
+		        			<input type="text" placeholder="{{ 'PLAYERS_MANAGE_PLACEHOLDER_LASTNAME' | translate }}" ng-model="lastName" ng-required="true" ng-maxlength="75"/>
+		        		</label>
+			        	<br/>
+			        	<br/>
+			        	<div class="content padding">
+					        <button class="button button-block button-balanced" ng-click="addPlayer()" id="btnAddPlayer" ng-disabled="frmManagePlayer.$invalid">{{ 'PLAYERS_MANAGE_BTN_ADD' | translate }}</button>
+					        <button class="button button-block button-balanced" ng-click="updatePlayer()" id="btnUpdatePlayer" style="display:none" ng-disabled="frmManagePlayer.$invalid">{{ 'PLAYERS_MANAGE_BTN_UPDATE' | translate }}</button>
+				        </div>
+			        	<br/>
+			        	<br/>
+			        	<br/>
+			        	<br/>
+		        	</form>
 				</ion-content>
 			</ion-view>
 		</script>
@@ -640,15 +680,27 @@ PPPPPPPPPP          llllllll  aaaaaaaaaa  aaaa    y:::::y            eeeeeeeeeee
 				<ion-content ng-controller="PlayerController">
 		        	<br/>
 		        	<br/>
+			        <div class="content padding">
+	        			<h1>{{player.firstname}}&nbsp;{{player.lastname}}</h1>
+	        		</div>
 		        	<br/>
-		        	<br/>
-	        		<h1>{{player.firstname}}&nbsp;{{player.lastname}}</h1>
 				    <button class="button button-full button-stable" >{{ 'PLAYERS_PLAYER_LBL_MATCHES' | translate }}{{ player.nrOfMatches }}</button>
 				    <button class="button button-full button-stable" >{{ 'PLAYERS_PLAYER_LBL_GOALS' | translate }}{{ player.nrOfGoals }}</button>
 		        	<br/>
 				    <button class="button button-full button-stable">{{ 'PLAYERS_PLAYER_LBL_TEAMS' | translate }}</button>
 					<ion-list>
-						<ion-item ng-repeat="team in teams" ng-click="goToTeam(team)">{{team.name}}</ion-item>
+						<ion-item ng-repeat="team in teams" ng-click="goToTeam(team)">
+						    <table cellspacing="0" cellpadding="0" border="0" width="100%">
+						    	<tr>
+						    		<td width="99%">
+						    			<span class="title">{{team.name}}</span>
+						    		</td>
+						    		<td align="right">
+						    			<i class="icon ion-chevron-right"></i>
+						    		</td>
+						    	</tr>
+						    </table>
+						</ion-item>
 					</ion-list>
 		        	<br/>
 		        	<br/>

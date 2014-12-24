@@ -3,6 +3,7 @@ var variables = {
 	databaseVersion : "1.3",
 	TWITTER : "TWITTER",
 	LANGUAGE_PREF : "LANGUAGE_PREF",
+	PLAYER_TYPE : 0,
 	OPPONENT_TYPE : 1,
 	UNDEFINED_TYPE : 2,
 	CARD_YELLOW : null,

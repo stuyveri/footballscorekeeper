@@ -414,6 +414,8 @@ TTTTTT  T:::::T  TTTTTTeeeeeeeeeeee    aaaaaaaaaaaaa      mmmmmmm    mmmmmmm    
 
 		PlayerService.getPlayersForTeam($scope.team, successRefreshTeamPlayers, error);
 		PlayerService.getAllPlayersNotInTeam($scope.team, successRefreshPlayers, error);
+
+		$scope.playerToAdd = "";
 	};
 
 	$scope.deletePlayer = function(player) {
@@ -431,6 +433,7 @@ TTTTTT  T:::::T  TTTTTTeeeeeeeeeeee    aaaaaaaaaaaaa      mmmmmmm    mmmmmmm    
 				destructiveButtonClicked: function() {
 					TeamService.removePlayerFromTeam($scope.team, player, successAddPlayer, error);
 					PlayerService.getPlayersForTeam($scope.team, successRefreshTeamPlayers, error);
+					PlayerService.getAllPlayersNotInTeam($scope.team, successRefreshPlayers, error);
 					return true;
 				}
 			});
